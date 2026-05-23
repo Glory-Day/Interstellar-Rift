@@ -1,0 +1,33 @@
+# Indicates this is the top-level EditorConfig file.
+# Stops searching for EditorConfig files in parent directories.
+root = true
+ 
+ 
+# Default settings applied to all files.
+[*]
+indent_style = space             # Use spaces for indentation
+indent_size = 4                  # Set indentation size to 4 spaces
+charset = utf-8                  # Set file encoding to UTF-8
+end_of_line = lf                 # Use LF line endings across all platforms
+trim_trailing_whitespace = true  # Automatically remove trailing whitespace
+insert_final_newline = true      # Ensure files end with a newline
+
+
+# XML file settings.
+[*.xml]
+indent_size = 2  # Set indentation size to 2 spaces
+ 
+ 
+# YAML / JSON file settings.
+[*.{yml,yaml,json}]
+indent_size = 2  # Set indentation size to 2 spaces
+ 
+ 
+# ShaderLab / HLSL file settings.
+[*.{shader,hlsl,cginc,glsl}]
+indent_size = 4  # Set indentation size to 4 spaces
+ 
+ 
+# Unity Assembly Definition file settings.
+[*.{asmdef,asmref}]
+indent_size = 2  # Set indentation size to 2 spaces (JSON format)
