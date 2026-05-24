@@ -81,6 +81,20 @@ MonoBehaviour:
         m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
       - m_Id: e38df3670d1754842954a3c09f189134
         m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+    - m_InheritedParent: 
+      m_Id: bb6404a75890bb74f965323ba936ae72
+      m_ProfileName: Production
+      m_Values:
+      - m_Id: 50b73514e1c633c4580dd6ee50323b84
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+      - m_Id: 8b64f010c59a116458661cebce558683
+        m_Value: 'https://github.com/Glory-Day/Interstellar-Rift/releases/download/bundles-latest/[BuildTarget]'
+      - m_Id: 97aa05ec90f4209479e458ab9a8381e9
+        m_Value: 'ServerData/[BuildTarget]'
+      - m_Id: c2fec73c083d86e4b9d85a0423308dfb
+        m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
+      - m_Id: e38df3670d1754842954a3c09f189134
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
     m_ProfileEntryNames:
     - m_Id: 50b73514e1c633c4580dd6ee50323b84
       m_Name: Local.LoadPath
