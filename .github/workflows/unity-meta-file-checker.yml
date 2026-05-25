@@ -1,0 +1,37 @@
+name: Unity Meta File Checker
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  unity-meta-check:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeNA/unity-meta-check@v3
+        with:
+          enable_autofix: true          # Enable automatic generation of missing .meta files
+          autofix_globs: .              # Paths where auto-correction is allowed
+          enable_junit: true            # Enable JUnit XML report generation
+          junit_xml_path: junit.xml     # Report file output path
+          enable_pr_comment: true       # Enable the display of test results via PR comments
+          pr_comment_lang: en           # Comment language settings
+          pr_comment_send_success: true # Post a success message even if the test passes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Check files created by Autofix (Always run)
+      - name: Show auto-fix result
+        run: git status
+        if: always()
+
+      # Display JUnit XML as a test report in the Actions UI (Always run)
+      - uses: mikepenz/action-junit-report@v2
+        with:
+          report_paths: junit.xml
+        if: always()
