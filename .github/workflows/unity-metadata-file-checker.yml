@@ -1,4 +1,4 @@
-name: Unity Meta File Checker
+name: Unity Metadata File Checker
 
 on:
   pull_request:
