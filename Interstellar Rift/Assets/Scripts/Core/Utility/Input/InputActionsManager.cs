@@ -6,7 +6,7 @@ using VContainer.Unity;
 
 namespace Core.Utility.Input
 {
-    public class InputActionManager : IInitializable, IDisposable
+    public class InputActionsManager : IInitializable, IDisposable
     {
         private readonly List<IGameInputActions> _gameInputActions = new List<IGameInputActions>();
         private readonly List<IUIInputActions> _uiInputActions = new List<IUIInputActions>();
@@ -14,7 +14,7 @@ namespace Core.Utility.Input
         private readonly IEnumerable<IGameInputActionsFactory> _gameInputActionsFactories;
         private readonly IEnumerable<IUIInputActionsFactory> _uiInputActionsFactories;
 
-        public InputActionManager(IEnumerable<IGameInputActionsFactory> gameInputActionsFactories,
+        public InputActionsManager(IEnumerable<IGameInputActionsFactory> gameInputActionsFactories,
                                   IEnumerable<IUIInputActionsFactory> uiInputActionsFactories)
         {
             _gameInputActionsFactories = gameInputActionsFactories;
