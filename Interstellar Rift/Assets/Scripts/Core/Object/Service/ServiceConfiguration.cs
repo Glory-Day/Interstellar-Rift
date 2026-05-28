@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GloryDay.Debug;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using VContainer;
@@ -17,10 +18,14 @@ namespace Core.Object.Service
 
         protected override void Configure(IContainerBuilder builder)
         {
+            Console.LogProgress();
+
             foreach (var asset in assets)
             {
                 asset.Install(builder);
             }
+
+            Console.LogSuccess("<b>All Services</b> are installed completely");
         }
     }
 }

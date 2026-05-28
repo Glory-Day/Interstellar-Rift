@@ -1,5 +1,8 @@
+using Core.Object.Map;
+using GloryDay.Debug;
 using UnityEngine;
 using VContainer;
+using VContainer.Unity;
 
 namespace Core.Object.Service
 {
@@ -8,7 +11,12 @@ namespace Core.Object.Service
     {
         public override void Install(IContainerBuilder builder)
         {
+            Console.LogProgress();
 
+            builder.RegisterComponentInHierarchy<Camera>();
+            builder.RegisterComponentInHierarchy<CameraZoomController>();
+
+            Console.LogSuccess("<b>Map Service</b> is installed");
         }
     }
 }

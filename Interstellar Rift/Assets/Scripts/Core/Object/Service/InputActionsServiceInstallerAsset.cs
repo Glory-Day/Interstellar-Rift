@@ -1,4 +1,5 @@
 using Core.Utility.Input;
+using GloryDay.Debug;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -10,6 +11,8 @@ namespace Core.Object.Service
     {
         public override void Install(IContainerBuilder builder)
         {
+            Console.LogProgress();
+
             // Register input action assets.
             builder.RegisterInstance(new MapInputActions());
 
@@ -18,6 +21,8 @@ namespace Core.Object.Service
 
             // Register input action manager to entry point.
             builder.RegisterEntryPoint<InputActionsManager>();
+
+            Console.LogSuccess("<b>Input Actions Service</b> is installed");
         }
     }
 }
