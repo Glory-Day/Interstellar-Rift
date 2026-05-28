@@ -1,0 +1,58 @@
+{
+    "version": 1,
+    "name": "Map Input Actions",
+    "maps": [
+        {
+            "name": "Camera",
+            "id": "180d9a3d-3bdd-4ee1-9cd2-e36bf5f2e0b5",
+            "actions": [
+                {
+                    "name": "Zoom",
+                    "type": "PassThrough",
+                    "id": "9a161863-e1ae-4416-9ab9-6ebbdbcd5eee",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "053c8c32-5d12-441c-a342-f17d756c1274",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3b4b615d-e094-45a9-8446-196c7f77acae",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Window Platform",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Window Platform",
+            "bindingGroup": "Window Platform",
+            "devices": [
+                {
+                    "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}
