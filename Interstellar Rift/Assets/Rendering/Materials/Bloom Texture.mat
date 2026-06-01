@@ -47,12 +47,12 @@ Material:
     m_Floats:
     - _Alpha: 0.91
     - _AlphaThreshold: 0.49
-    - _Emission: 1
+    - _Emission: 3
     - _EnableExternalAlpha: 0
     - _Intensity: 2
     - _OutlineSize: 2.9
     - _Size: 0.003
-    - _Threshold: 0.1
+    - _Threshold: 0
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
