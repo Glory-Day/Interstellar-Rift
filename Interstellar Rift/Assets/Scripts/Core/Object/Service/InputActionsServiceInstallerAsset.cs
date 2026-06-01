@@ -15,9 +15,11 @@ namespace Core.Object.Service
 
             // Register input action assets.
             builder.RegisterInstance(new MapInputActions());
+            builder.RegisterInstance(new ModuleInputActions());
 
             // Register input actions factories.
             builder.Register<IGameInputActionsFactory, CameraInputActionsFactory>(Lifetime.Scoped);
+            builder.Register<IGameInputActionsFactory, BoosterInputActionsFactory>(Lifetime.Scoped);
 
             // Register input action manager to entry point.
             builder.RegisterEntryPoint<InputActionsManager>();
