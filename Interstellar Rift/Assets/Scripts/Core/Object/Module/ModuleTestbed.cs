@@ -9,11 +9,13 @@ namespace Core.Object.Module
     {
         #region SERIALIZABLE PROPERTY API
 
-        [field: Title("Data")]
-        [field: SerializeField] private ModuleData Data { get; set; }
+        [Title("Data")]
+        [ReadOnly]
+        [SerializeField] private ModuleRank rank;
+        [SerializeField] private ModuleDataTable table;
 
-        [field: Title("References")]
-        [field: SerializeField] private ModuleTextureRenderer Renderer { get; set; }
+        [Title("References")]
+        [SerializeField] private ModuleTextureRenderer[] renderers;
 
         #endregion
 
@@ -21,7 +23,10 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
-            Renderer.Apply(Data.Rank.ToColorProvider());
+            for (var i = 0; i < renderers.Length; i++)
+            {
+                renderers[i].Apply(rank.ToColorProvider());
+            }
         }
     }
 }

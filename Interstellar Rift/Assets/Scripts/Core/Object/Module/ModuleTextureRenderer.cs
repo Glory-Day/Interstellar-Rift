@@ -13,7 +13,7 @@ namespace Core.Object.Module
 
         #endregion
 
-        private static readonly int TextureID = Shader.PropertyToID("_MainTexture");
+        private static readonly int TextureID = Shader.PropertyToID("_MainTex");
         private static readonly int ColorID = Shader.PropertyToID("_Color");
 
         private MaterialPropertyBlock _block;

@@ -1,8 +1,8 @@
 namespace Core.Object.Module
 {
-    public enum Rank
+    public enum ModuleRank
     {
-        Alpha,
+        Alpha = 0,
         Beta,
         Gamma,
         Delta,
