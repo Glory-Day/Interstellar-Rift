@@ -203,6 +203,54 @@ namespace Core.Utility.Input
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""Default"",
+            ""id"": ""e6d7c747-4132-489c-8885-32531c87545e"",
+            ""actions"": [
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""8c988db3-08ad-4173-a1bd-6abf89342bff"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Dragging"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""bb22653d-18eb-401f-96cd-9c0ba8b4ff86"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""0043c88a-1629-4e31-ba9e-43af965598dc"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Window Platform"",
+                    ""action"": ""Dragging"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c83c30ec-0d6d-4919-a2d4-1e86445e8027"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Window Platform"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -228,11 +276,16 @@ namespace Core.Utility.Input
             m_Booster = asset.FindActionMap("Booster", throwIfNotFound: true);
             m_Booster_Move = m_Booster.FindAction("Move", throwIfNotFound: true);
             m_Booster_Rotate = m_Booster.FindAction("Rotate", throwIfNotFound: true);
+            // Default
+            m_Default = asset.FindActionMap("Default", throwIfNotFound: true);
+            m_Default_Click = m_Default.FindAction("Click", throwIfNotFound: true);
+            m_Default_Dragging = m_Default.FindAction("Dragging", throwIfNotFound: true);
         }
 
         ~@ModuleInputActions()
         {
             UnityEngine.Debug.Assert(!m_Booster.enabled, "This will cause a leak and performance issues, ModuleInputActions.Booster.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Default.enabled, "This will cause a leak and performance issues, ModuleInputActions.Default.Disable() has not been called.");
         }
 
         /// <summary>
@@ -411,6 +464,113 @@ namespace Core.Utility.Input
         /// Provides a new <see cref="BoosterActions" /> instance referencing this action map.
         /// </summary>
         public BoosterActions @Booster => new BoosterActions(this);
+
+        // Default
+        private readonly InputActionMap m_Default;
+        private List<IDefaultActions> m_DefaultActionsCallbackInterfaces = new List<IDefaultActions>();
+        private readonly InputAction m_Default_Click;
+        private readonly InputAction m_Default_Dragging;
+        /// <summary>
+        /// Provides access to input actions defined in input action map "Default".
+        /// </summary>
+        public struct DefaultActions
+        {
+            private @ModuleInputActions m_Wrapper;
+
+            /// <summary>
+            /// Construct a new instance of the input action map wrapper class.
+            /// </summary>
+            public DefaultActions(@ModuleInputActions wrapper) { m_Wrapper = wrapper; }
+            /// <summary>
+            /// Provides access to the underlying input action "Default/Click".
+            /// </summary>
+            public InputAction @Click => m_Wrapper.m_Default_Click;
+            /// <summary>
+            /// Provides access to the underlying input action "Default/Dragging".
+            /// </summary>
+            public InputAction @Dragging => m_Wrapper.m_Default_Dragging;
+            /// <summary>
+            /// Provides access to the underlying input action map instance.
+            /// </summary>
+            public InputActionMap Get() { return m_Wrapper.m_Default; }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+            public void Enable() { Get().Enable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+            public void Disable() { Get().Disable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+            public bool enabled => Get().enabled;
+            /// <summary>
+            /// Implicitly converts an <see ref="DefaultActions" /> to an <see ref="InputActionMap" /> instance.
+            /// </summary>
+            public static implicit operator InputActionMap(DefaultActions set) { return set.Get(); }
+            /// <summary>
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <param name="instance">Callback instance.</param>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+            /// </remarks>
+            /// <seealso cref="DefaultActions" />
+            public void AddCallbacks(IDefaultActions instance)
+            {
+                if (instance == null || m_Wrapper.m_DefaultActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_DefaultActionsCallbackInterfaces.Add(instance);
+                @Click.started += instance.OnClick;
+                @Click.performed += instance.OnClick;
+                @Click.canceled += instance.OnClick;
+                @Dragging.started += instance.OnDragging;
+                @Dragging.performed += instance.OnDragging;
+                @Dragging.canceled += instance.OnDragging;
+            }
+
+            /// <summary>
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <remarks>
+            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+            /// </remarks>
+            /// <seealso cref="DefaultActions" />
+            private void UnregisterCallbacks(IDefaultActions instance)
+            {
+                @Click.started -= instance.OnClick;
+                @Click.performed -= instance.OnClick;
+                @Click.canceled -= instance.OnClick;
+                @Dragging.started -= instance.OnDragging;
+                @Dragging.performed -= instance.OnDragging;
+                @Dragging.canceled -= instance.OnDragging;
+            }
+
+            /// <summary>
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="DefaultActions.UnregisterCallbacks(IDefaultActions)" />.
+            /// </summary>
+            /// <seealso cref="DefaultActions.UnregisterCallbacks(IDefaultActions)" />
+            public void RemoveCallbacks(IDefaultActions instance)
+            {
+                if (m_Wrapper.m_DefaultActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            /// <summary>
+            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+            /// </remarks>
+            /// <seealso cref="DefaultActions.AddCallbacks(IDefaultActions)" />
+            /// <seealso cref="DefaultActions.RemoveCallbacks(IDefaultActions)" />
+            /// <seealso cref="DefaultActions.UnregisterCallbacks(IDefaultActions)" />
+            public void SetCallbacks(IDefaultActions instance)
+            {
+                foreach (var item in m_Wrapper.m_DefaultActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_DefaultActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        /// <summary>
+        /// Provides a new <see cref="DefaultActions" /> instance referencing this action map.
+        /// </summary>
+        public DefaultActions @Default => new DefaultActions(this);
         private int m_WindowPlatformSchemeIndex = -1;
         /// <summary>
         /// Provides access to the input control scheme.
@@ -445,6 +605,28 @@ namespace Core.Utility.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnRotate(InputAction.CallbackContext context);
+        }
+        /// <summary>
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Default" which allows adding and removing callbacks.
+        /// </summary>
+        /// <seealso cref="DefaultActions.AddCallbacks(IDefaultActions)" />
+        /// <seealso cref="DefaultActions.RemoveCallbacks(IDefaultActions)" />
+        public interface IDefaultActions
+        {
+            /// <summary>
+            /// Method invoked when associated input action "Click" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnClick(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Dragging" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnDragging(InputAction.CallbackContext context);
         }
     }
 }

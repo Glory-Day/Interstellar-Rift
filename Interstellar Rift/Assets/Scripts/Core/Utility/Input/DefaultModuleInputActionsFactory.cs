@@ -1,17 +1,17 @@
 namespace Core.Utility.Input
 {
-    public class BoosterInputActionsFactory : IGameInputActionsFactory
+    public class DefaultModuleInputActionsFactory : IGameInputActionsFactory
     {
         private readonly ModuleInputActions _inputActions;
 
-        public BoosterInputActionsFactory(ModuleInputActions inputActions)
+        public DefaultModuleInputActionsFactory(ModuleInputActions inputActions)
         {
             _inputActions = inputActions;
         }
 
         public IGameInputActions Create()
         {
-            return new BoosterInputActions(_inputActions);
+            return new DefaultModuleInputActions(_inputActions);
         }
     }
 }

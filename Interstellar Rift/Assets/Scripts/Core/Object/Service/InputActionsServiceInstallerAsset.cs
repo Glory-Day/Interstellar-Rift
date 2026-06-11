@@ -19,7 +19,8 @@ namespace Core.Object.Service
 
             // Register input actions factories.
             builder.Register<IGameInputActionsFactory, CameraInputActionsFactory>(Lifetime.Scoped);
-            builder.Register<IGameInputActionsFactory, BoosterInputActionsFactory>(Lifetime.Scoped);
+            builder.Register<IGameInputActionsFactory, DefaultModuleInputActionsFactory>(Lifetime.Scoped);
+            builder.Register<IGameInputActionsFactory, BoosterModuleInputActionsFactory>(Lifetime.Scoped);
 
             // Register input action manager to entry point.
             builder.RegisterEntryPoint<InputActionsManager>();
