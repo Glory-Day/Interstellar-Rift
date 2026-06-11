@@ -4,11 +4,11 @@ using UnityEngine.InputSystem;
 
 namespace Core.Utility.Input
 {
-    public class BoosterInputActions : IGameInputActions
+    public class BoosterModuleInputActions : IGameInputActions
     {
         private readonly ModuleInputActions _inputActions;
 
-        public BoosterInputActions(ModuleInputActions inputActions)
+        public BoosterModuleInputActions(ModuleInputActions inputActions)
         {
             _inputActions = inputActions;
         }
