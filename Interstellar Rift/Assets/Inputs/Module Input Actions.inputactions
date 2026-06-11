@@ -115,6 +115,54 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "Default",
+            "id": "e6d7c747-4132-489c-8885-32531c87545e",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "8c988db3-08ad-4173-a1bd-6abf89342bff",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Dragging",
+                    "type": "PassThrough",
+                    "id": "bb22653d-18eb-401f-96cd-9c0ba8b4ff86",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "0043c88a-1629-4e31-ba9e-43af965598dc",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Window Platform",
+                    "action": "Dragging",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c83c30ec-0d6d-4919-a2d4-1e86445e8027",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Window Platform",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
