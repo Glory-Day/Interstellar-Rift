@@ -7,7 +7,7 @@ using Console = GloryDay.Debug.Console;
 
 namespace Core.Utility.Pool
 {
-    public class ObjectPool
+    public class ObjectPool : IDisposable
     {
         private readonly Dictionary<GameObject, Container> _containers = new Dictionary<GameObject, Container>();
 
@@ -108,7 +108,7 @@ namespace Core.Utility.Pool
         /// </summary>
         /// <param name="configuration">The configuration to apply to the new pool container.</param>
         /// <returns>The newly created pool container.</returns>
-        public Container CreateContainer(ObjectPoolConfiguration configuration)
+        private Container CreateContainer(ObjectPoolConfiguration configuration)
         {
             var origin = configuration.Origin;
             var container = new GameObject($"{origin.name} (Pool)");
@@ -119,7 +119,7 @@ namespace Core.Utility.Pool
             return pool;
         }
 
-        private Container GetContainer(GameObject origin)
+        public Container GetContainer(GameObject origin)
         {
             if (_containers.TryGetValue(origin, out var container))
             {
