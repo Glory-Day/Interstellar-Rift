@@ -1,15 +1,16 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+using Console = GloryDay.Debug.Console;
+
 namespace Core.Object.Module
 {
-    [RequireComponent(typeof(SpriteRenderer))]
-    public class ModuleTextureRenderer : MonoBehaviour
+    public class ModuleTextureRenderer : ModuleServiceBehaviour
     {
         #region SERIALIZABLE FIELD API
 
         [Title("References")]
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private SpriteRenderer[] spriteRenderers;
 
         #endregion
 
@@ -20,17 +21,36 @@ namespace Core.Object.Module
 
         private void Awake()
         {
+            Console.LogProgress();
+
             _block = new MaterialPropertyBlock();
         }
 
-        public void Apply(IColorProvider provider)
+        public void Draw()
         {
-            spriteRenderer.GetPropertyBlock(_block);
-
-            _block.SetTexture(TextureID, spriteRenderer.sprite.texture);
-            _block.SetColor(ColorID, provider.Color);
-
-            spriteRenderer.SetPropertyBlock(_block);
+            Applicator.OnColorChanged += Apply;
+            Applicator.Apply();
         }
+
+        public void Cancel()
+        {
+            Applicator.OnColorChanged -= Apply;
+            (Applicator as GradientColorApplicator)?.Cancel();
+        }
+
+        private void Apply(Color color)
+        {
+            for (var i = 0; i < spriteRenderers.Length; i++)
+            {
+                spriteRenderers[i].GetPropertyBlock(_block);
+
+                _block.SetTexture(TextureID, spriteRenderers[i].sprite.texture);
+                _block.SetColor(ColorID, color);
+
+                spriteRenderers[i].SetPropertyBlock(_block);
+            }
+        }
+
+        public IColorApplicator Applicator { get; set; }
     }
 }
