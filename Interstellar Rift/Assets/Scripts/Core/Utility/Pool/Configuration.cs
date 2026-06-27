@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Core.Utility.Pool
 {
-    public class ObjectPoolConfiguration
+    public class Configuration
     {
         /// <summary>
         /// The original prefab to be cloned when the object pool creates a new instance.

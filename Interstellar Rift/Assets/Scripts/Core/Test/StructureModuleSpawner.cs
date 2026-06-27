@@ -55,7 +55,7 @@ namespace Core.Test
                 var database = testbeds[i].database;
                 var spawner = testbeds[i].spawner;
 
-                var configuration = new ObjectPoolConfiguration
+                var configuration = new Configuration
                 {
                     Origin = module,
                     DefaultCapacity = 5,

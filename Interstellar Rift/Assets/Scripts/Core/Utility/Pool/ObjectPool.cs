@@ -28,7 +28,7 @@ namespace Core.Utility.Pool
         /// </summary>
         /// <param name="configuration">The configuration to apply to the new pool container.</param>
         /// <exception cref="ArgumentNullException">Thrown when the original prefab in <paramref name="configuration"/> is <see langword="null"/>.</exception>
-        public void Register(ObjectPoolConfiguration configuration)
+        public void Register(Configuration configuration)
         {
             var origin = configuration.Origin;
 
@@ -108,7 +108,7 @@ namespace Core.Utility.Pool
         /// </summary>
         /// <param name="configuration">The configuration to apply to the new pool container.</param>
         /// <returns>The newly created pool container.</returns>
-        private Container CreateContainer(ObjectPoolConfiguration configuration)
+        private Container CreateContainer(Configuration configuration)
         {
             var origin = configuration.Origin;
             var container = new GameObject($"{origin.name} (Pool)");
@@ -128,7 +128,7 @@ namespace Core.Utility.Pool
 
             Console.LogWarning($"Pool for {origin.name} was not found. Therefore, a new default pool has been created.");
 
-            container = CreateContainer(new ObjectPoolConfiguration { Origin = origin });
+            container = CreateContainer(new Configuration { Origin = origin });
             _containers.Add(origin, container);
 
             return container;

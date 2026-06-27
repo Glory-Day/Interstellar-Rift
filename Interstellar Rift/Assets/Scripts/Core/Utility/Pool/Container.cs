@@ -17,7 +17,7 @@ namespace Core.Utility.Pool
         /// <param name="origin">The original prefab to be cloned by this container.</param>
         /// <param name="parent">The parent transform under which inactive objects are held.</param>
         /// <param name="configuration">The configuration to apply to the object pool.</param>
-        public Container(GameObject origin, Transform parent, ObjectPoolConfiguration configuration)
+        public Container(GameObject origin, Transform parent, Configuration configuration)
         {
             _origin = origin;
             _parent = parent;
