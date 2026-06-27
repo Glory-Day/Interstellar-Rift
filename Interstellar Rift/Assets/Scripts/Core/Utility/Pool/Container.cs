@@ -82,7 +82,7 @@ namespace Core.Utility.Pool
             var releaser = clone.AddComponent<ObjectPoolReleaser>();
             releaser.OnRelease += () => Release(clone);
 
-            OnAfterCreated?.Invoke();
+            OnAfterCreated?.Invoke(clone);
 
             return clone;
         }
@@ -91,30 +91,30 @@ namespace Core.Utility.Pool
         {
             Console.LogProgress();
 
-            OnBeforeGetting?.Invoke();
+            OnBeforeGetting?.Invoke(clone);
 
             clone.SetActive(true);
 
-            OnAfterGetting?.Invoke();
+            OnAfterGetting?.Invoke(clone);
         }
 
         private void Release_Internal(GameObject clone)
         {
             Console.LogProgress();
 
-            OnBeforeReleased?.Invoke();
+            OnBeforeReleased?.Invoke(clone);
 
             clone.SetActive(false);
             clone.transform.SetParent(_parent, false);
 
-            OnAfterReleased?.Invoke();
+            OnAfterReleased?.Invoke(clone);
         }
 
         private void Destroy_Internal(GameObject clone)
         {
             Console.LogProgress();
 
-            OnBeforeDestroyed?.Invoke();
+            OnBeforeDestroyed?.Invoke(clone);
 
             UnityEngine.Object.Destroy(clone);
 
@@ -129,32 +129,32 @@ namespace Core.Utility.Pool
         /// <summary>
         /// Occurs after a new object is instantiated in the pool.
         /// </summary>
-        public event Action OnAfterCreated;
+        public event Action<GameObject> OnAfterCreated;
 
         /// <summary>
         /// Occurs before an object is retrieved from the pool.
         /// </summary>
-        public event Action OnBeforeGetting;
+        public event Action<GameObject> OnBeforeGetting;
 
         /// <summary>
         /// Occurs after an object is retrieved from the pool.
         /// </summary>
-        public event Action OnAfterGetting;
+        public event Action<GameObject> OnAfterGetting;
 
         /// <summary>
         /// Occurs before an object is returned to the pool.
         /// </summary>
-        public event Action OnBeforeReleased;
+        public event Action<GameObject> OnBeforeReleased;
 
         /// <summary>
         /// Occurs after an object is returned to the pool.
         /// </summary>
-        public event Action OnAfterReleased;
+        public event Action<GameObject> OnAfterReleased;
 
         /// <summary>
         /// Occurs before an object is destroyed due to the pool exceeding its maximum size.
         /// </summary>
-        public event Action OnBeforeDestroyed;
+        public event Action<GameObject> OnBeforeDestroyed;
 
         /// <summary>
         /// Occurs after an object is destroyed due to the pool exceeding its maximum size.
