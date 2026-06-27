@@ -1,12 +1,20 @@
 using System;
-using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace Core.Object.Module
 {
     [Serializable]
     public class ModuleData
     {
-        [ShowInInspector] public float Mass { get; set; }
-        [ShowInInspector] public float Durability { get; set; }
+        #region SERIALIZABLE FIELD API
+
+        [SerializeField] protected float mass;
+        [SerializeField] protected float durability;
+
+        #endregion
+
+        public float Mass => mass;
+
+        public float Durability => durability;
     }
 }
