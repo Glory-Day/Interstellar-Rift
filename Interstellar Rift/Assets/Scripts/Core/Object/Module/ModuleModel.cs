@@ -5,16 +5,12 @@ namespace Core.Object.Module
         protected ModuleModel(ModuleRank rank, ModuleData data)
         {
             Rank = rank;
-
-            Mass = data.Mass;
-            Durability = data.Durability;
+            Data = data;
         }
 
-        public float Mass { get; protected set; }
-
-        public float Durability { get; protected set; }
-
         public ModuleRank Rank { get; protected set; }
+
+        public ModuleData Data { get; protected set; }
 
         public abstract string Name { get; }
     }
