@@ -58,73 +58,19 @@ MonoBehaviour:
     - model: {fileID: 8926484042661615285}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661615310}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 8926484042661615300}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615362}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615510}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615512}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615518}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615522}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615526}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615536}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661615283}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661615369}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 8926484042661615373}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615388}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661615392}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661615394}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 0}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 0}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 0}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 0}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 0}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 0}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 8926484042661615436}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615438}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661615181}
@@ -154,9 +100,6 @@ MonoBehaviour:
       height: 1641
     contents:
     - model: {fileID: 114023846229194376}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661614599}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661615132}
@@ -216,22 +159,10 @@ MonoBehaviour:
     - model: {fileID: 8926484042661614578}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661614610}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 114780028408030698}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661614647}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661614691}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 8926484042661614595}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615239}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661615252}
@@ -247,7 +178,7 @@ MonoBehaviour:
     x: -633
     y: -603
     width: 3298
-    height: 1972
+    height: 1973
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6309,7 +6240,7 @@ MonoBehaviour:
         m_SerializableType: UnityEditor.VFX.Position, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"position":{"x":0.0,"y":0.0,"z":0.0}}'
-    m_Space: 0
+    m_Space: 1
   m_Property:
     name: _Position
     m_serializedType:
@@ -7206,7 +7137,7 @@ MonoBehaviour:
         m_SerializableType: UnityEditor.VFX.Position, Unity.VisualEffectGraph.Editor,
           Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
       m_SerializableObject: '{"position":{"x":0.0,"y":0.0,"z":0.0}}'
-    m_Space: 0
+    m_Space: 1
   m_Property:
     name: _Position
     m_serializedType:
