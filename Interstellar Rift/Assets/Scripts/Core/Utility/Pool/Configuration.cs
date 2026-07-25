@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Core.Utility.Pool
 {
+    /// <summary>
+    /// Configures the behavior of an object pool, such as its capacity limits and prewarming.
+    /// </summary>
     public class Configuration
     {
         /// <summary>
