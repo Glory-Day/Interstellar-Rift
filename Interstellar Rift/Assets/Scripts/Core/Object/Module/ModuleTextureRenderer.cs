@@ -1,15 +1,21 @@
+using Core.Object.Service;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+using Console = GloryDay.Debug.Console;
+
 namespace Core.Object.Module
 {
-    [RequireComponent(typeof(SpriteRenderer))]
-    public class ModuleTextureRenderer : MonoBehaviour
+    /// <summary>
+    /// A service that assigns a color based on the module's rank and renders that color onto its texture.
+    /// </summary>
+    public class ModuleTextureRenderer : LocalServiceBehaviour
     {
         #region SERIALIZABLE FIELD API
 
         [Title("References")]
-        [SerializeField] private SpriteRenderer spriteRenderer;
+        [Tooltip("The sprite renderers within the module.")]
+        [SerializeField] private SpriteRenderer[] spriteRenderers;
 
         #endregion
 
@@ -20,17 +26,49 @@ namespace Core.Object.Module
 
         private void Awake()
         {
+            Console.LogProgress();
+
             _block = new MaterialPropertyBlock();
         }
 
-        public void Apply(IColorProvider provider)
+        /// <summary>
+        /// Starts applying the assigned color by subscribing to the applicator's color updates.
+        /// </summary>
+        public void Draw()
         {
-            spriteRenderer.GetPropertyBlock(_block);
-
-            _block.SetTexture(TextureID, spriteRenderer.sprite.texture);
-            _block.SetColor(ColorID, provider.Color);
-
-            spriteRenderer.SetPropertyBlock(_block);
+            Applicator.OnColorChanged += Apply;
+            Applicator.Apply();
         }
+
+        /// <summary>
+        /// Stops applying the assigned color by unsubscribing from the applicator's color updates.
+        /// </summary>
+        public void Cancel()
+        {
+            Applicator.OnColorChanged -= Apply;
+            (Applicator as GradientColorApplicator)?.Cancel();
+        }
+
+        /// <summary>
+        /// Applies the given color to every sprite renderer's material.
+        /// </summary>
+        /// <param name="color">The color to apply.</param>
+        private void Apply(Color color)
+        {
+            for (var i = 0; i < spriteRenderers.Length; i++)
+            {
+                spriteRenderers[i].GetPropertyBlock(_block);
+
+                _block.SetTexture(TextureID, spriteRenderers[i].sprite.texture);
+                _block.SetColor(ColorID, color);
+
+                spriteRenderers[i].SetPropertyBlock(_block);
+            }
+        }
+
+        /// <summary>
+        /// The <see cref="IColorApplicator"/> that determines the module's color based on its rank.
+        /// </summary>
+        public IColorApplicator Applicator { get; set; }
     }
 }

@@ -2,11 +2,14 @@ namespace Core.Object.Module.Structure
 {
     public sealed class CoreModuleModel : ModuleModel
     {
-        public CoreModuleModel(ModuleRank rank, ModuleData data) : base(rank, data) { }
+        private readonly ModuleDataTable database;
 
-        public void Upgrade(ModuleRank rank, ModuleData data)
+        public CoreModuleModel(ModuleRank rank, ModuleData data, ModuleDataTable database) : base(rank, data) { }
+
+        public void Upgrade(ModuleRank rank)
         {
             Rank = rank;
+            Data = database[rank];
         }
 
         public override string Name => ModuleNames.Structure.CoreModule;

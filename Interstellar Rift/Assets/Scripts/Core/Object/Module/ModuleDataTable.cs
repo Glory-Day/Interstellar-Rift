@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Core.Object.Module
 {
-    [CreateAssetMenu(fileName = "Module Data", menuName =  "Scriptable Objects/Data/Module/Base")]
-    public class ModuleDataTable : ScriptableObject
+    [CreateAssetMenu(fileName = "Module Data", menuName = "Scriptable Objects/Data/Module/Core\\Connection")]
+    public class ModuleDataTable : SerializedScriptableObject
     {
         [DictionaryDrawerSettings(KeyLabel = "Rank", ValueLabel = "Data")]
-        [ShowInInspector] private Dictionary<ModuleRank, ModuleData> table;
+        [SerializeField] private Dictionary<ModuleRank, ModuleData> table = new Dictionary<ModuleRank, ModuleData>();
 
         public ModuleData this[ModuleRank rank] => table[rank];
     }
