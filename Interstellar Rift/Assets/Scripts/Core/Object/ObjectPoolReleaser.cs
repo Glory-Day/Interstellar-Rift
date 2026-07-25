@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Core.Object
 {
+    /// <summary>
+    /// Attached to a pooled object so it can trigger its own release back to the pool by raising <see cref="OnRelease"/>.
+    /// </summary>
     [DisallowMultipleComponent]
     public class ObjectPoolReleaser : MonoBehaviour
     {

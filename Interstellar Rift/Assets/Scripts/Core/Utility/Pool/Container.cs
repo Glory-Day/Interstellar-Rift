@@ -7,6 +7,9 @@ using Console = GloryDay.Debug.Console;
 
 namespace Core.Utility.Pool
 {
+    /// <summary>
+    /// Manages a pool of cloned <see cref="GameObject"/> instances, handling their creation, retrieval, release, and destruction.
+    /// </summary>
     public class Container : IDisposable
     {
         private readonly ObjectPool<GameObject> _pool;
@@ -33,7 +36,7 @@ namespace Core.Utility.Pool
         }
 
         /// <summary>
-        /// From the pool, select an object and activate it.
+        /// Selects an object from the pool and activates it.
         /// </summary>
         public GameObject Get()
         {
@@ -63,12 +66,20 @@ namespace Core.Utility.Pool
             _pool.Clear();
         }
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
+        /// <summary>
+        /// Disposes the underlying pool, destroying every currently pooled (inactive) object.
+        /// Objects retrieved via <see cref="Get"/> and not yet released are not destroyed.
+        /// </summary>
         public void Dispose()
         {
             _pool.Dispose();
         }
 
+        /// <summary>
+        /// Called by the pool to create a new object when none are available to reuse.
+        /// Instantiates a clone of <see cref="_origin"/>, deactivates it, and attaches an <see cref="ObjectPoolReleaser"/> so it can release itself.
+        /// </summary>
+        /// <returns>The newly created, deactivated clone.</returns>
         private GameObject Create_Internal()
         {
             Console.LogProgress();
@@ -87,6 +98,10 @@ namespace Core.Utility.Pool
             return clone;
         }
 
+        /// <summary>
+        /// Called by the pool when an object is retrieved via <see cref="Get"/>. Activates the object.
+        /// </summary>
+        /// <param name="clone">The object being retrieved.</param>
         private void Get_Internal(GameObject clone)
         {
             Console.LogProgress();
@@ -98,6 +113,10 @@ namespace Core.Utility.Pool
             OnAfterGetting?.Invoke(clone);
         }
 
+        /// <summary>
+        /// Called by the pool when an object is returned via <see cref="Release"/>. Deactivates the object and reparents it under <see cref="_parent"/>.
+        /// </summary>
+        /// <param name="clone">The object being released.</param>
         private void Release_Internal(GameObject clone)
         {
             Console.LogProgress();
@@ -110,6 +129,11 @@ namespace Core.Utility.Pool
             OnAfterReleased?.Invoke(clone);
         }
 
+        /// <summary>
+        /// Called by the pool to destroy a pooled (inactive) object, either because the pool exceeded <see cref="Configuration.MaximumSize"/>
+        /// on release, or because <see cref="Clear"/> or <see cref="Dispose"/> was called.
+        /// </summary>
+        /// <param name="clone">The object being destroyed.</param>
         private void Destroy_Internal(GameObject clone)
         {
             Console.LogProgress();
@@ -152,27 +176,29 @@ namespace Core.Utility.Pool
         public event Action<GameObject> OnAfterReleased;
 
         /// <summary>
-        /// Occurs before an object is destroyed due to the pool exceeding its maximum size.
+        /// Occurs before a pooled (inactive) object is destroyed, either because the pool exceeded its maximum size on release,
+        /// or because <see cref="Clear"/> or <see cref="Dispose"/> was called.
         /// </summary>
         public event Action<GameObject> OnBeforeDestroyed;
 
         /// <summary>
-        /// Occurs after an object is destroyed due to the pool exceeding its maximum size.
+        /// Occurs after a pooled (inactive) object is destroyed, either because the pool exceeded its maximum size on release,
+        /// or because <see cref="Clear"/> or <see cref="Dispose"/> was called.
         /// </summary>
         public event Action OnAfterDestroyed;
 
         /// <summary>
-        /// Count of deactivated objects.
+        /// Gets the number of deactivated (pooled) objects.
         /// </summary>
         public int CountDeactivatedObjects => _pool.CountInactive;
 
         /// <summary>
-        /// Count of activated objects.
+        /// Gets the number of activated (in-use) objects.
         /// </summary>
         public int CountActivatedObjects => _pool.CountActive;
 
         /// <summary>
-        /// Count of all objects.
+        /// Gets the total number of objects tracked by the pool, both activated and deactivated.
         /// </summary>
         public int CountAllObjects => _pool.CountAll;
     }

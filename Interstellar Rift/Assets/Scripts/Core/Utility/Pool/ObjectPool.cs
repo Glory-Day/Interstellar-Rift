@@ -7,6 +7,9 @@ using Console = GloryDay.Debug.Console;
 
 namespace Core.Utility.Pool
 {
+    /// <summary>
+    /// Manages a collection of <see cref="Container"/> instances, one per registered prefab, providing pooled retrieval and lifecycle control.
+    /// </summary>
     public class ObjectPool : IDisposable
     {
         private readonly Dictionary<GameObject, Container> _containers = new Dictionary<GameObject, Container>();
@@ -57,6 +60,7 @@ namespace Core.Utility.Pool
         /// Unregisters the pool container associated with the specified original prefab and disposes it.
         /// </summary>
         /// <param name="origin">The original prefab whose pool container is to be unregistered.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="origin"/> is <see langword="null"/>.</exception>
         /// <exception cref="NotContainedException">Thrown when no container is found for <paramref name="origin"/>.</exception>
         public void Unregister(GameObject origin)
         {
@@ -119,6 +123,12 @@ namespace Core.Utility.Pool
             return pool;
         }
 
+        /// <summary>
+        /// Gets the pool container for the specified original prefab. If no container is registered for it,
+        /// implicitly creates and registers one using a default <see cref="Configuration"/>.
+        /// </summary>
+        /// <param name="origin">The original prefab whose pool container to get.</param>
+        /// <returns>The existing or newly created pool container.</returns>
         public Container GetContainer(GameObject origin)
         {
             if (_containers.TryGetValue(origin, out var container))
