@@ -1,5 +1,8 @@
 namespace Core.Utility.Input
 {
+    /// <summary>
+    /// Represents a factory that creates <see cref="IUIInputActions"/> instances.
+    /// </summary>
     public interface IUIInputActionsFactory
     {
         /// <summary>
