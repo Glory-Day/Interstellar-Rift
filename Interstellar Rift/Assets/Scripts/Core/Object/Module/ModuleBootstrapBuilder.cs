@@ -1,3 +1,5 @@
+using Core.Object.Service;
+
 namespace Core.Object.Module
 {
     public abstract class ModuleBootstrapBuilder<TModuleBoostrap, TBuilder> : IModuleBootstrapBuilder<TModuleBoostrap, TBuilder>
@@ -5,7 +7,7 @@ namespace Core.Object.Module
         protected ModuleRank Rank;
         protected ModuleModel Model;
 
-        protected ModuleServiceResolver Resolver;
+        protected ServiceResolver Resolver;
 
         protected UpdateEventHandler UpdateEventHandler;
 
@@ -15,7 +17,7 @@ namespace Core.Object.Module
             Model = model;
         }
 
-        public TBuilder WithServiceMediator(ModuleServiceResolver resolver)
+        public TBuilder WithServiceMediator(ServiceResolver resolver)
         {
             Resolver = resolver;
 

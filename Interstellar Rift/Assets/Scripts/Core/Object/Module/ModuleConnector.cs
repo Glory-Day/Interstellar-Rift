@@ -5,17 +5,27 @@ using UnityEngine;
 
 namespace Core.Object.Module
 {
+    /// <summary>
+    /// A service that provides the functionality to attach a module to an attachable slot.
+    /// </summary>
     public class ModuleConnector : LocalServiceBehaviour, INode
     {
         #region SERIALIZABLE FIELD API
 
         [Title("References")]
         [DictionaryDrawerSettings(KeyLabel = "Direction", ValueLabel = "Slot")]
+        [Tooltip("The list of slots that provide the connection functionality needed to connect a module.")]
         [SerializeField] private List<Slot> slots;
+        [Tooltip("The slot used for this module to connect to another module.")]
         [SerializeField] private Slot joint;
 
         #endregion
 
+        /// <summary>
+        /// Attaches a module to the slot at the given direction.
+        /// </summary>
+        /// <param name="direction">The direction of the slot configured on the module.</param>
+        /// <param name="connector">The <see cref="ModuleConnector"/> of the module to attach.</param>
         public void Connect(Direction direction, ModuleConnector connector)
         {
             var count = slots.Count;
@@ -31,6 +41,10 @@ namespace Core.Object.Module
             }
         }
 
+        /// <summary>
+        /// Detaches the module from the slot at the given direction.
+        /// </summary>
+        /// <param name="direction">The direction of the slot configured on the module.</param>
         public void Disconnect(Direction direction)
         {
             var count = slots.Count;
@@ -46,7 +60,8 @@ namespace Core.Object.Module
             }
         }
 
-        public INode GetChild(Direction direction)
+        /// <inheritdoc/>
+        public INode GetChildNode(Direction direction)
         {
             var count = slots.Count;
             for (var i = 0; i < count; i++)
@@ -60,7 +75,8 @@ namespace Core.Object.Module
             return null;
         }
 
-        public bool HasChild(Direction direction)
+        /// <inheritdoc/>
+        public bool HasChildNode(Direction direction)
         {
             var count = slots.Count;
             for (var i = 0; i < count; i++)
@@ -74,19 +90,28 @@ namespace Core.Object.Module
             return false;
         }
 
-        public bool TryGetChild(Direction direction, out INode child)
+        /// <inheritdoc/>
+        public bool TryGetChildNode(Direction direction, out INode child)
         {
-            child = GetChild(direction);
+            child = GetChildNode(direction);
 
             return child != null;
         }
 
+        /// <summary>
+        /// The list of slots that provide the connection functionality needed to connect a module.
+        /// </summary>
         public List<Slot> Slots => slots;
 
+        /// <summary>
+        /// The slot used for this module to connect to another module.
+        /// </summary>
         public Slot Joint => joint;
 
-        public INode Parent => joint.Connector;
+        /// <inheritdoc/>
+        public INode ParentNode => joint.Connector;
 
-        public bool IsRoot => joint == null;
+        /// <inheritdoc/>
+        public bool IsRootNode => joint == null;
     }
 }

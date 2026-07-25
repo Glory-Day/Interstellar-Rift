@@ -3,6 +3,7 @@
 using System;
 using Core.Object.Module;
 using Core.Object.Module.Structure;
+using Core.Object.Service;
 using Core.Utility.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -18,7 +19,10 @@ namespace Core.Test
         #region SERIALIZABLE FIELD API
 
         [Title("References")]
+        [Title("Module Testbed Table", HorizontalLine = false)]
         [SerializeField] private ModuleTestbed[] testbeds;
+        [Title("Object Pool", HorizontalLine = false)]
+        [SerializeField] private ObjectPoolAsset[] assets;
 
         #endregion
 
@@ -40,10 +44,41 @@ namespace Core.Test
         {
             Console.LogProgress();
 
+            PoolModuleTestbeds();
+            PoolAssets();
+
             Spawn();
         }
 
-        private void Spawn()
+        private void PoolAssets()
+        {
+            Console.LogProgress();
+
+            var length = assets.Length;
+            for (var i = 0; i < length; i++)
+            {
+                var asset = assets[i].asset;
+                var count = assets[i].count;
+
+                var configuration = new Configuration
+                {
+                    Origin = asset,
+                    DefaultCapacity = count,
+                    MaximumSize = count,
+                    PrewarmCount = 0,
+                    IsCollectionChecked = true
+                };
+
+                _objectPool.Register(configuration);
+
+                var container = _objectPool.GetContainer(asset);
+                container.OnAfterCreated += InstallServices;
+
+                Console.LogSuccess($"{asset.name} is successfully spawned.");
+            }
+        }
+
+        private void PoolModuleTestbeds()
         {
             Console.LogProgress();
 
@@ -53,7 +88,6 @@ namespace Core.Test
                 var rank = testbeds[i].rank;
                 var module = testbeds[i].module;
                 var database = testbeds[i].database;
-                var spawner = testbeds[i].spawner;
 
                 var configuration = new Configuration
                 {
@@ -69,6 +103,20 @@ namespace Core.Test
                 var container = _objectPool.GetContainer(module);
                 container.OnAfterCreated += InstallServices;
                 container.OnAfterCreated += clone => BootModule(clone, rank, database);
+
+                Console.LogSuccess($"{module.name} is successfully spawned.");
+            }
+        }
+
+        private void Spawn()
+        {
+            Console.LogProgress();
+
+            var length = testbeds.Length;
+            for (var i = 0; i < length; i++)
+            {
+                var module = testbeds[i].module;
+                var spawner = testbeds[i].spawner;
 
                 var clone = _objectPool.Get(module, spawner.position, spawner.rotation);
 
@@ -90,7 +138,7 @@ namespace Core.Test
             Console.LogProgress();
 
             var label = clone.name[..^14];
-            var resolver = clone.GetComponent<ModuleServiceResolver>();
+            var resolver = clone.GetComponentInChildren<ServiceResolver>();
             var model = new StructureModuleModelFactory(label, rank, database).Create();
             var bootstrap = new StructureModuleBootstrapFactory(model, resolver).Create();
             bootstrap.Boot();
@@ -107,6 +155,13 @@ namespace Core.Test
             public GameObject module;
             public ModuleDataTable database;
             public Transform spawner;
+        }
+
+        [Serializable]
+        private struct ObjectPoolAsset
+        {
+            public GameObject asset;
+            public int count;
         }
 
         #endregion

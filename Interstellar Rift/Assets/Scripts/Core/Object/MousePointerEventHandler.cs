@@ -1,12 +1,15 @@
 using System;
-using UnityEngine;
+using Core.Object.Service;
 using UnityEngine.EventSystems;
 
 using Console = GloryDay.Debug.Console;
 
 namespace Core.Object
 {
-    public class MousePointerEventHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    /// <summary>
+    /// A local service that detects when the mouse pointer enters or exits the module, re-raising Unity's pointer events as subscribable events.
+    /// </summary>
+    public class MousePointerEventHandler : LocalServiceBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private void OnDestroy()
         {

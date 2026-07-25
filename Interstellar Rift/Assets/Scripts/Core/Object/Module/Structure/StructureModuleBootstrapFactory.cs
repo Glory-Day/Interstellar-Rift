@@ -1,4 +1,5 @@
 using System;
+using Core.Object.Service;
 using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module.Structure
@@ -6,9 +7,9 @@ namespace Core.Object.Module.Structure
     public class StructureModuleBootstrapFactory : IFactory<IBootable>
     {
         private readonly ModuleModel _model;
-        private readonly ModuleServiceResolver _resolver;
+        private readonly ServiceResolver _resolver;
 
-        public StructureModuleBootstrapFactory(ModuleModel model,  ModuleServiceResolver resolver)
+        public StructureModuleBootstrapFactory(ModuleModel model,  ServiceResolver resolver)
         {
             _model = model;
             _resolver = resolver;

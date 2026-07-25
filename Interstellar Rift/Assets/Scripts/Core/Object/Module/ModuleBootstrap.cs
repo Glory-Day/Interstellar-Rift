@@ -1,4 +1,5 @@
-using GloryDay.Debug;
+using Core.Object.Service;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module
 {
@@ -6,9 +7,9 @@ namespace Core.Object.Module
     {
         private readonly ModuleModel _model;
 
-        private readonly ModuleServiceResolver _resolver;
+        private readonly ServiceResolver _resolver;
 
-        protected ModuleBootstrap(ModuleModel model, ModuleServiceResolver resolver)
+        protected ModuleBootstrap(ModuleModel model, ServiceResolver resolver)
         {
             _model = model;
             _resolver = resolver;
@@ -19,6 +20,9 @@ namespace Core.Object.Module
             Console.LogProgress();
 
             var rank = _model.Rank;
+
+            IInitializable initializer = new ModuleLocalServiceInitializer(_resolver);
+            initializer.Initialize();
 
             var updateEventHandler = _resolver.GetGlobalService<UpdateEventHandler>();
             var factory = new ColorApplicatorFactory(rank, updateEventHandler);

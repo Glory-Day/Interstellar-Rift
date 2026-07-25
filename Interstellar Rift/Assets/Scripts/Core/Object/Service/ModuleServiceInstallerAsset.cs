@@ -1,10 +1,12 @@
-using Core.Object.Module.Structure;
 using GloryDay.Debug;
 using UnityEngine;
 using VContainer;
 
 namespace Core.Object.Service
 {
+    /// <summary>
+    /// A <see cref="ServiceInstallerAsset"/> reserved for registering module-related services with the container.
+    /// </summary>
     [CreateAssetMenu(fileName = "Module Service Installer", menuName = "Scriptable Objects/Services/Installer/Module")]
     public class ModuleServiceInstallerAsset : ServiceInstallerAsset
     {

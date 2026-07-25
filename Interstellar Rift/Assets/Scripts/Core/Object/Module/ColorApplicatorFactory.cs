@@ -3,15 +3,27 @@ using UnityEngine;
 
 namespace Core.Object.Module
 {
+    /// <summary>
+    /// Creates an appropriate <see cref="IColorApplicator"/> for the given <see cref="ModuleRank"/>.
+    /// For most ranks, it provides a fixed color specific to that rank; for the <see cref="ModuleRank.Lambda"/> rank, it provides an animated gradient applicator.
+    /// </summary>
     public class ColorApplicatorFactory : IFactory<IColorApplicator>
     {
-        private readonly ModuleRank _rank;
-        private readonly UpdateEventHandler _handler;
+        #region SERVICE FIELD API
 
-        public ColorApplicatorFactory(ModuleRank rank, UpdateEventHandler handler)
+        private readonly UpdateEventHandler _updateEventHandler;
+
+        #endregion
+
+        private readonly ModuleRank _rank;
+
+        /// <param name="rank">The <see cref="ModuleRank"/> to create a color applicator for.</param>
+        /// <param name="updateEventHandler">The <see cref="UpdateEventHandler"/> service to inject.</param>
+        public ColorApplicatorFactory(ModuleRank rank, UpdateEventHandler updateEventHandler)
         {
             _rank = rank;
-            _handler = handler;
+
+            _updateEventHandler = updateEventHandler;
         }
 
         public IColorApplicator Create()
@@ -28,7 +40,7 @@ namespace Core.Object.Module
                 ModuleRank.Theta   => new FixedColorApplicator(new Color(68  / 255f, 221 / 255f, 170 / 255f)),
                 ModuleRank.Iota    => new FixedColorApplicator(new Color(0   / 255f, 255 / 255f, 170 / 255f)),
                 ModuleRank.Kappa   => new FixedColorApplicator(new Color(232 / 255f, 232 / 255f, 208 / 255f)),
-                ModuleRank.Lambda  => new GradientColorApplicator(_handler),
+                ModuleRank.Lambda  => new GradientColorApplicator(_updateEventHandler),
                 _                  => throw new ArgumentOutOfRangeException(nameof(_rank), _rank, null)
             };
         }

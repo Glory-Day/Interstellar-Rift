@@ -10,12 +10,17 @@ using ColorUtility = UnityEngine.ColorUtility;
 
 namespace Core.Object.Module
 {
+    /// <summary>
+    /// A service that provides the ability to search for the nearest module the dragged module can attach to, and the nearest attachable slot on that module.
+    /// </summary>
     public class ModuleSearcher : LocalServiceBehaviour
     {
         #region SERIALIZABLE FIELD API
 
         [Title("Configuration")]
+        [Tooltip("Radius for searching modules.")]
         [SerializeField] private float radius;
+        [Tooltip("The layer mask of modules to search for.")]
         [SerializeField] private LayerMask target;
 
         #endregion
@@ -29,6 +34,7 @@ namespace Core.Object.Module
 
 #endif
 
+        /// <inheritdoc/>
         public override void Initialize()
         {
             Console.LogProgress();
@@ -218,19 +224,34 @@ namespace Core.Object.Module
 
         #region UNITY EDITOR DEBUG API
 
+        /// <summary>
+        /// Editor-only. Holds information used for visual debugging in the Unity Editor.
+        /// </summary>
         private class DebugInformation
         {
-            // The position of this object.
+            /// <summary>
+            /// The position of this object.
+            /// </summary>
             public Vector3 Origin { get; set; }
 
-            // The position of the found module GameObject.
+            /// <summary>
+            /// The position of the found module GameObject.
+            /// </summary>
             public Vector3? PositionForModule { get; set; }
-            // The color used to indicate the found module.
+
+            /// <summary>
+            /// The color used to indicate the found module.
+            /// </summary>
             public Color ColorForModule { get; set; }
 
-            // The positions of the slots attached to the found module.
+            /// <summary>
+            /// The positions of the slots attached to the found module.
+            /// </summary>
             public List<Vector3> PositionsForSlot { get; } = new List<Vector3>();
-            // The colors used to indicate the attachment state of each slot.
+
+            /// <summary>
+            /// The colors used to indicate the attachment state of each slot.
+            /// </summary>
             public List<Color> ColorsForSlot { get; } = new List<Color>();
         }
 
