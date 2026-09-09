@@ -1,5 +1,4 @@
 using Core.Object.Service;
-using UnityEngine;
 using UnityEngine.EventSystems;
 
 using Console = GloryDay.Debug.Console;
@@ -9,50 +8,52 @@ namespace Core.Object.Module
     /// <summary>
     /// Coordinates module dragging by wiring mouse button events to the module's movement, slot search, and visual effect services.
     /// </summary>
-    public class ModuleDragEventHandler : LocalServiceBehaviour
+    public class ModuleDragEventHandler : LocalService
     {
-        #region SERVICE FIELD API
+        #region LOCAL SERVICE API
 
-        private ModuleConnector _connector;
-        private ModuleSearcher _searcher;
-        private ModuleDragMovement _movement;
-        private ModuleDragEffector _effector;
-
-        private MouseButtonEventHandler _handler;
+        private ModuleSocket _moduleSocket;
+        private ModuleSearcher _moduleSearcher;
+        private ModuleDragMovement _moduleDragMovement;
+        private ModuleDragVisualEffect _moduleDragVisualEffect;
+        private MouseButtonEventDispatcher _mouseButtonEventDispatcher;
 
         #endregion
 
-        /// <inheritdoc/>
-        public override void Initialize()
+        public ModuleDragEventHandler(ServiceResolver resolver) : base(resolver)
         {
             Console.LogProgress();
 
-            _connector = Resolver.GetLocalService<ModuleConnector>();
-            _searcher = Resolver.GetLocalService<ModuleSearcher>();
-            _movement = Resolver.GetLocalService<ModuleDragMovement>();
-            _effector = Resolver.GetLocalService<ModuleDragEffector>();
+            _moduleSocket = Resolver.GetLocalService<ModuleSocket>();
+            _moduleSearcher = Resolver.GetLocalService<ModuleSearcher>();
+            _moduleDragMovement = Resolver.GetLocalService<ModuleDragMovement>();
+            _moduleDragVisualEffect = Resolver.GetLocalService<ModuleDragVisualEffect>();
 
-            _handler = Resolver.GetLocalService<MouseButtonEventHandler>();
-            _handler.OnMouseButtonPressed += BeginMoving;
-            _handler.OnMouseButtonPressed += Search;
-            _handler.OnMouseButtonDragged += Move;
-            _handler.OnMouseButtonDragged += Search;
-            _handler.OnMouseButtonReleased += EndMoving;
-            _handler.OnMouseButtonReleased += EndVisualEffect;
-
-            base.Initialize();
+            _mouseButtonEventDispatcher = Resolver.GetLocalService<MouseButtonEventDispatcher>();
+            _mouseButtonEventDispatcher.OnMouseButtonPressed += BeginMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed += Search;
+            _mouseButtonEventDispatcher.OnMouseButtonDragged += Move;
+            _mouseButtonEventDispatcher.OnMouseButtonDragged += Search;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased += EndMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased += EndVisualEffect;
         }
 
-        private void OnDestroy()
+        public override void Dispose()
         {
             Console.LogProgress();
 
-            _handler.OnMouseButtonPressed -= BeginMoving;
-            _handler.OnMouseButtonPressed -= Search;
-            _handler.OnMouseButtonDragged -= Move;
-            _handler.OnMouseButtonDragged -= Search;
-            _handler.OnMouseButtonReleased -= EndMoving;
-            _handler.OnMouseButtonReleased -= EndVisualEffect;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed -= BeginMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed -= Search;
+            _mouseButtonEventDispatcher.OnMouseButtonDragged -= Move;
+            _mouseButtonEventDispatcher.OnMouseButtonDragged -= Search;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased -= EndMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased -= EndVisualEffect;
+
+            _moduleSocket = null;
+            _moduleSearcher = null;
+            _moduleDragMovement = null;
+            _moduleDragVisualEffect = null;
+            _mouseButtonEventDispatcher = null;
         }
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace Core.Object.Module
         /// <param name="eventData">The pointer event data from the mouse press.</param>
         private void BeginMoving(PointerEventData eventData)
         {
-            _movement.BeginMoving(eventData.position);
+            _moduleDragMovement.BeginMoving(eventData.position);
         }
 
         /// <summary>
@@ -70,7 +71,7 @@ namespace Core.Object.Module
         /// <param name="eventData">The pointer event data from the mouse drag.</param>
         private void Move(PointerEventData eventData)
         {
-            _movement.Move(eventData.position);
+            _moduleDragMovement.Move(eventData.position);
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace Core.Object.Module
         /// <param name="eventData">The pointer event data from the mouse release.</param>
         private void EndMoving(PointerEventData eventData)
         {
-            _movement.EndMoving();
+            _moduleDragMovement.EndMoving();
         }
 
         /// <summary>
@@ -89,21 +90,21 @@ namespace Core.Object.Module
         /// <param name="eventData">The pointer event data from the mouse press or drag.</param>
         private void Search(PointerEventData eventData)
         {
-            var result = _searcher.Search();
-            var spawner = _connector.Joint.transform.position;
+            var result = _moduleSearcher.Search();
+            var spawner = _moduleSocket.Joint.transform.position;
 
             if (result.HasValue)
             {
-                if (_effector.IsUpdating == false)
+                if (_moduleDragVisualEffect.IsUpdating == false)
                 {
-                    _effector.StartVisualEffect(spawner, result.Value);
+                    _moduleDragVisualEffect.StartVisualEffect(spawner, result.Value);
                 }
             }
             else
             {
-                if (_effector.IsUpdating)
+                if (_moduleDragVisualEffect.IsUpdating)
                 {
-                    _effector.StopVisualEffect();
+                    _moduleDragVisualEffect.StopVisualEffect();
                 }
 
                 return;
@@ -112,17 +113,17 @@ namespace Core.Object.Module
             var slot = result.Value.Slot;
             var target = slot.transform.position;
 
-            _effector.UpdateVisualEffect(spawner, result.Value);
-            _movement.Rotate(target);
+            _moduleDragVisualEffect.UpdateVisualEffect(spawner, result.Value);
+            _moduleDragMovement.Rotate(target);
         }
 
         /// <summary>
-        /// Stops the arc visual effect via <see cref="ModuleDragEffector.StopVisualEffect"/>.
+        /// Stops the arc visual effect via <see cref="ModuleDragVisualEffect.StopVisualEffect"/>.
         /// </summary>
         /// <param name="eventData">The pointer event data from the mouse release.</param>
         private void EndVisualEffect(PointerEventData eventData)
         {
-            _effector.StopVisualEffect();
+            _moduleDragVisualEffect.StopVisualEffect();
         }
     }
 }

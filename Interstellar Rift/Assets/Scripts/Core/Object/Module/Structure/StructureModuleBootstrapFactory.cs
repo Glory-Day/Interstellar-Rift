@@ -1,32 +1,36 @@
 using System;
-using Core.Object.Service;
+using Core.Utility.Extension;
 using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module.Structure
 {
-    public class StructureModuleBootstrapFactory : IFactory<IBootable>
+    public class StructureModuleBootstrapFactory : IModuleBootstrapFactory
     {
-        private readonly ModuleModel _model;
-        private readonly ServiceResolver _resolver;
+        private readonly ModuleBootstrapConfiguration _configuration;
 
-        public StructureModuleBootstrapFactory(ModuleModel model,  ServiceResolver resolver)
+        public StructureModuleBootstrapFactory(ModuleBootstrapConfiguration configuration)
         {
-            _model = model;
-            _resolver = resolver;
+            Console.LogProgress();
+
+            _configuration = configuration;
         }
 
         public IBootable Create()
         {
             Console.LogProgress();
 
-            var name = _model.Name;
+            var name = _configuration.Name;
 
-            return name switch
+            ModuleBootstrap bootstrap = name switch
             {
-                ModuleNames.Structure.CoreModule => new CoreModuleBootstrap(_model, _resolver),
-                ModuleNames.Structure.ConnectionModule => new ConnectionModuleBootstrap(_model,  _resolver),
+                ModuleNames.Structure.CoreModule => new CoreModuleBootstrap(_configuration),
+                ModuleNames.Structure.ConnectionModule => new ConnectionModuleBootstrap(_configuration),
                 _ => throw new ArgumentOutOfRangeException(nameof(name), name, null)
             };
+
+            Console.LogSuccess($"{nameof(ModuleBootstrap).ToNicifyPascalCase().ToBoldStyle()} for {name} is created.");
+
+            return bootstrap;
         }
     }
 }

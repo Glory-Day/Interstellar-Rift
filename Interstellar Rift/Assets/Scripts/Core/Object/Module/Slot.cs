@@ -1,3 +1,5 @@
+using Core.Object.Service;
+using GloryDay.Debug;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -18,15 +20,33 @@ namespace Core.Object.Module
 
         #endregion
 
+        private ModuleSocket _socket;
+
+        public void Connect(ModuleSocket socket)
+        {
+            Console.LogProgress();
+
+            _socket = socket;
+            state = SlotState.Attachable;
+        }
+
+        public void Disconnect()
+        {
+            Console.LogProgress();
+
+            _socket = null;
+            state = SlotState.Unattachable;
+        }
+
         /// <summary>
         /// The service that provides the functionality to attach a module.
         /// </summary>
-        public ModuleConnector Connector { get; set; }
+        public ModuleSocket Socket => _socket;
 
         /// <summary>
         /// The slot's current attachment state.
         /// </summary>
-        public SlotState State { get => state; set => state = value; }
+        public SlotState State => state;
 
         /// <summary>
         /// The slot's fixed direction, as configured in the Inspector.

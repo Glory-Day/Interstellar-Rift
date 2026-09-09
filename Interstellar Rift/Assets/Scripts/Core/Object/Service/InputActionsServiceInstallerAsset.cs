@@ -9,13 +9,16 @@ namespace Core.Object.Service
     /// <summary>
     /// A <see cref="ServiceInstallerAsset"/> that registers the project's input action assets, factories, and entry point with the container.
     /// </summary>
-    [CreateAssetMenu(fileName = "Input Actions Service Installer", menuName = "Scriptable Objects/Services/Installer/Input Actions")]
+    [CreateAssetMenu(fileName = "Input Actions Service Installer Asset",
+                     menuName = "Assets/Services/Global/Installer/Input Actions")]
     public class InputActionsServiceInstallerAsset : ServiceInstallerAsset
     {
         /// <inheritdoc/>
         public override void Install(IContainerBuilder builder)
         {
             Console.LogProgress();
+
+            base.Install(builder);
 
             // Register input action assets.
             builder.RegisterInstance(new MapInputActions());

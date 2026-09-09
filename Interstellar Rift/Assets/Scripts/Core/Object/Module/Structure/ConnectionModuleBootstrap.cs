@@ -1,9 +1,12 @@
-using Core.Object.Service;
+using GloryDay.Debug;
 
 namespace Core.Object.Module.Structure
 {
     public class ConnectionModuleBootstrap : ModuleBootstrap
     {
-        public ConnectionModuleBootstrap(ModuleModel model, ServiceResolver resolver) : base(model, resolver) { }
+        public ConnectionModuleBootstrap(ModuleBootstrapConfiguration configuration) : base(configuration)
+        {
+            Console.LogProgress();
+        }
     }
 }

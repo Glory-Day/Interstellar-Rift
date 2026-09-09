@@ -1,6 +1,7 @@
-using System;
+using Core.Object.Service;
+using GloryDay.Debug;
 using UnityEngine;
-using Console = GloryDay.Debug.Console;
+using VContainer;
 
 namespace Core.Object
 {
@@ -8,45 +9,31 @@ namespace Core.Object
     /// A global service that exposes Unity's <c>Update</c>, <c>FixedUpdate</c>, and <c>LateUpdate</c> messages as events,
     /// allowing non-<see cref="MonoBehaviour"/> classes to subscribe to per-frame updates.
     /// </summary>
-    public class UpdateEventHandler : MonoBehaviour
+    public class UpdateEventHandler : GlobalClientBehaviour
     {
+        private UpdateEventDispatcher _updateEventDispatcher;
+
+        [Inject]
+        protected override void Install(IObjectResolver resolver)
+        {
+            Console.LogProgress();
+
+            _updateEventDispatcher = resolver.Resolve<UpdateEventDispatcher>();
+        }
+
         private void Update()
         {
-            OnUpdate?.Invoke();
+            _updateEventDispatcher.Update();
         }
 
         private void FixedUpdate()
         {
-            OnFixedUpdate?.Invoke();
+            _updateEventDispatcher.FixedUpdate();
         }
 
         private void LateUpdate()
         {
-            OnLateUpdate?.Invoke();
+            _updateEventDispatcher.LateUpdate();
         }
-
-        private void OnDestroy()
-        {
-            Console.LogProgress();
-
-            OnUpdate = null;
-            OnFixedUpdate = null;
-            OnLateUpdate = null;
-        }
-
-        /// <summary>
-        /// Occurs every frame, mirroring Unity's <c>Update</c> message.
-        /// </summary>
-        public event Action OnUpdate;
-
-        /// <summary>
-        /// Occurs every fixed-timestep physics frame, mirroring Unity's <c>FixedUpdate</c> message.
-        /// </summary>
-        public event Action OnFixedUpdate;
-
-        /// <summary>
-        /// Occurs every frame after all <see cref="OnUpdate"/> subscribers have run, mirroring Unity's <c>LateUpdate</c> message.
-        /// </summary>
-        public event Action OnLateUpdate;
     }
 }

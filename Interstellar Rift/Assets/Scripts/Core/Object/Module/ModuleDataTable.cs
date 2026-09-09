@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace Core.Object.Module
 {
-    [CreateAssetMenu(fileName = "Module Data", menuName = "Scriptable Objects/Data/Module/Core\\Connection")]
+    [CreateAssetMenu(fileName = "Module Data Table",
+                     menuName = "Assets/Data/Module Data Table")]
     public class ModuleDataTable : SerializedScriptableObject
     {
         [DictionaryDrawerSettings(KeyLabel = "Rank", ValueLabel = "Data")]

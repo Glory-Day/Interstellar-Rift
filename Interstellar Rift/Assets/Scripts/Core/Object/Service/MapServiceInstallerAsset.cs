@@ -9,14 +9,16 @@ namespace Core.Object.Service
     /// <summary>
     /// A <see cref="ServiceInstallerAsset"/> that registers the map's camera and zoom controller with the container.
     /// </summary>
-    [CreateAssetMenu(fileName = "Map Service Installer", menuName = "Scriptable Objects/Services/Installer/Map")]
+    [CreateAssetMenu(fileName = "Map Service Installer Asset",
+                     menuName = "Assets/Services/Global/Installer/Map")]
     public class MapServiceInstallerAsset : ServiceInstallerAsset
     {
         public override void Install(IContainerBuilder builder)
         {
             Console.LogProgress();
 
-            builder.RegisterComponentInHierarchy<Camera>();
+            base.Install(builder);
+
             builder.RegisterComponentInHierarchy<CameraZoomController>();
 
             Console.LogSuccess("<b>Map Service</b> is installed");

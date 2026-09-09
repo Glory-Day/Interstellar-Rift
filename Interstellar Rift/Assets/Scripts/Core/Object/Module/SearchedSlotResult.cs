@@ -7,31 +7,21 @@ namespace Core.Object.Module
     /// </summary>
     public readonly struct SearchedSlotResult
     {
-        //TODO: Radius is a constant that never changes after being set, so passing it through this struct on every search is unnecessary.
-        //      Once ElectricArcController becomes a LocalServiceBehaviour, it should receive ModuleSearcher via Initialize() and read Radius from it directly.
-        /// <summary>
-        /// Radius for searching <see cref="Slot"/>.
-        /// </summary>
-        public readonly float Radius;
-
         /// <summary>
         /// The service that provides the functionality to attach a searched module.
         /// </summary>
-        public readonly ModuleConnector Connector;
+        public readonly ModuleSocket Socket;
 
         /// <summary>
         /// The searched connectable <see cref="Slot"/>.
         /// </summary>
         public readonly Slot Slot;
 
-        /// <param name="radius">Radius for searching <see cref="Slot"/>.</param>
-        /// <param name="connector">The service that provides the functionality to attach a searched module.</param>
+        /// <param name="socket">The service that provides the functionality to attach a searched module.</param>
         /// <param name="slot">The searched connectable <see cref="Slot"/>.</param>
-        public SearchedSlotResult(float radius, ModuleConnector connector, Slot slot)
+        public SearchedSlotResult(ModuleSocket socket, Slot slot)
         {
-            Radius = radius;
-
-            Connector = connector;
+            Socket = socket;
             Slot = slot;
         }
 

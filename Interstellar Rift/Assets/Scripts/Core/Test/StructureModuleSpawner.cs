@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 
-using System;
 using Core.Object.Module;
 using Core.Object.Module.Structure;
 using Core.Object.Service;
@@ -20,7 +19,7 @@ namespace Core.Test
 
         [Title("References")]
         [Title("Module Testbed Table", HorizontalLine = false)]
-        [SerializeField] private ModuleTestbed[] testbeds;
+        [SerializeField] private ModuleSpawnSpecification[] testbeds;
         [Title("Object Pool", HorizontalLine = false)]
         [SerializeField] private ObjectPoolAsset[] assets;
 
@@ -82,12 +81,9 @@ namespace Core.Test
         {
             Console.LogProgress();
 
-            var length = testbeds.Length;
-            for (var i = 0; i < length; i++)
+            foreach (var testbed in testbeds)
             {
-                var rank = testbeds[i].rank;
-                var module = testbeds[i].module;
-                var database = testbeds[i].database;
+                var module = testbed.prefab;
 
                 var configuration = new Configuration
                 {
@@ -102,7 +98,7 @@ namespace Core.Test
 
                 var container = _objectPool.GetContainer(module);
                 container.OnAfterCreated += InstallServices;
-                container.OnAfterCreated += clone => BootModule(clone, rank, database);
+                container.OnAfterCreated += clone => BootStructureModule(clone, testbed);
 
                 Console.LogSuccess($"{module.name} is successfully spawned.");
             }
@@ -115,7 +111,7 @@ namespace Core.Test
             var length = testbeds.Length;
             for (var i = 0; i < length; i++)
             {
-                var module = testbeds[i].module;
+                var module = testbeds[i].prefab;
                 var spawner = testbeds[i].spawner;
 
                 var clone = _objectPool.Get(module, spawner.position, spawner.rotation);
@@ -133,38 +129,16 @@ namespace Core.Test
             Console.LogEventMessage("All services are installed.");
         }
 
-        private void BootModule(GameObject clone, ModuleRank rank, ModuleDataTable database)
+        private void BootStructureModule(GameObject clone, ModuleSpawnSpecification specification)
         {
             Console.LogProgress();
 
-            var label = clone.name[..^14];
-            var resolver = clone.GetComponentInChildren<ServiceResolver>();
-            var model = new StructureModuleModelFactory(label, rank, database).Create();
-            var bootstrap = new StructureModuleBootstrapFactory(model, resolver).Create();
+            var configuration = new ModuleBootstrapConfiguration(_resolver, clone, specification);
+            var bootstrap = new StructureModuleBootstrapFactory(configuration).Create();
             bootstrap.Boot();
 
             Console.LogEventMessage("Module is booting completely.");
         }
-
-        #region SERIALIZABLE STRUCTURE API
-
-        [Serializable]
-        private struct ModuleTestbed
-        {
-            public ModuleRank rank;
-            public GameObject module;
-            public ModuleDataTable database;
-            public Transform spawner;
-        }
-
-        [Serializable]
-        private struct ObjectPoolAsset
-        {
-            public GameObject asset;
-            public int count;
-        }
-
-        #endregion
     }
 }
 

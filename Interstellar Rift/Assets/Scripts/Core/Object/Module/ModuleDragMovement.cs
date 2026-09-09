@@ -1,6 +1,5 @@
 using Core.Object.Service;
 using GloryDay.Debug;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Core.Object.Module
@@ -8,34 +7,43 @@ namespace Core.Object.Module
     /// <summary>
     /// A service that provides the functionality to move a module while it is being dragged.
     /// </summary>
-    public class ModuleDragMovement : LocalServiceBehaviour
+    public class ModuleDragMovement : LocalService
     {
-        #region SERIALIZABLE FIELD API
-
-        [Title("Configuration")]
-        [Tooltip("Rotation speed. If 0, the module rotates instantly instead of smoothly.")]
-        [SerializeField] [Range(0f, 10f)] private float speed = 5f;
-
-        #endregion
-
-        #region SERVICE FIELD API
+        #region GLOBAL SERVICE API
 
         private Camera _camera;
 
         #endregion
 
-        private Vector3 _offset;
+        #region LOCAL SERVICE API
 
+        private Transform _transform;
+
+        #endregion
+
+        private readonly float _speed;
+
+        private Vector3 _offset;
         private bool _isMoving;
 
-        /// <inheritdoc/>
-        public override void Initialize()
+        public ModuleDragMovement(float speed, ServiceResolver resolver) : base(resolver)
         {
             Console.LogProgress();
 
-            _camera = Resolver.GetGlobalService<Camera>();
+            _speed = speed;
 
-            base.Initialize();
+            _camera = resolver.GetGlobalService<Camera>();
+
+            _transform = resolver.GetLocalService<ModuleTransformResolver>().Main;
+        }
+
+        public override void Dispose()
+        {
+            Console.LogProgress();
+
+            _camera = null;
+
+            _transform = null;
         }
 
         /// <summary>
@@ -47,7 +55,7 @@ namespace Core.Object.Module
             var point = _camera.ScreenToWorldPoint(position);
             point.z = 0f;
 
-            _offset = transform.position - point;
+            _offset = _transform.position - point;
 
             _isMoving = true;
         }
@@ -67,7 +75,7 @@ namespace Core.Object.Module
             var point = _camera.ScreenToWorldPoint(position);
             point.z = 0f;
 
-            transform.position = point + _offset;
+            _transform.position = point + _offset;
         }
 
         /// <summary>
@@ -84,11 +92,11 @@ namespace Core.Object.Module
         /// <param name="position">The world position of the nearest module found by <see cref="ModuleSearcher"/>.</param>
         public void Rotate(Vector3 position)
         {
-            var direction = (Vector2)(position - transform.position);
+            var direction = (Vector2)(position - _transform.position);
             var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             var rotation = Quaternion.Euler(0f, 0f, angle);
 
-            transform.rotation = speed > 0f ? Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * speed) : rotation;
+            _transform.rotation = _speed > 0f ? Quaternion.Lerp(_transform.rotation, rotation, Time.deltaTime * _speed) : rotation;
         }
     }
 }

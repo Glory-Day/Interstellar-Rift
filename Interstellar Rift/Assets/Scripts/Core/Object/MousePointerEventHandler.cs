@@ -9,14 +9,24 @@ namespace Core.Object
     /// <summary>
     /// A local service that detects when the mouse pointer enters or exits the module, re-raising Unity's pointer events as subscribable events.
     /// </summary>
-    public class MousePointerEventHandler : LocalServiceBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class MousePointerEventHandler : LocalClientBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        private MousePointerEventDispatcher _mousePointerEventDispatcher;
+
+        public override void Install()
+        {
+            Console.LogProgress();
+
+            _mousePointerEventDispatcher = Resolver.GetLocalService<MousePointerEventDispatcher>();
+
+            base.Install();
+        }
+
         private void OnDestroy()
         {
             Console.LogProgress();
 
-            OnMousePointerEntered = null;
-            OnMousePointerExited = null;
+            _mousePointerEventDispatcher = null;
         }
 
         /// <summary>
@@ -27,7 +37,7 @@ namespace Core.Object
         {
             Console.LogEventMessage("Mouse pointer is entered.");
 
-            OnMousePointerEntered?.Invoke(eventData);
+            _mousePointerEventDispatcher.EnterMousePointer(eventData);
         }
 
         /// <summary>
@@ -38,17 +48,7 @@ namespace Core.Object
         {
             Console.LogEventMessage("Mouse pointer is exited.");
 
-            OnMousePointerExited?.Invoke(eventData);
+            _mousePointerEventDispatcher.ExitMousePointer(eventData);
         }
-
-        /// <summary>
-        /// Occurs when the mouse pointer enters the module.
-        /// </summary>
-        public event Action<PointerEventData> OnMousePointerEntered;
-
-        /// <summary>
-        /// Occurs when the mouse pointer exits the module.
-        /// </summary>
-        public event Action<PointerEventData> OnMousePointerExited;
     }
 }

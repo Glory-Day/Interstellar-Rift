@@ -1,48 +1,47 @@
 using System.Collections.Generic;
 using Core.Object.Service;
-using Core.Utility.Pool;
 using GloryDay.Debug;
-using GloryDay.Debug.Gizmos;
-using Sirenix.OdinInspector;
 using UnityEngine;
-
-using ColorUtility = UnityEngine.ColorUtility;
 
 namespace Core.Object.Module
 {
     /// <summary>
     /// A service that provides the ability to search for the nearest module the dragged module can attach to, and the nearest attachable slot on that module.
     /// </summary>
-    public class ModuleSearcher : LocalServiceBehaviour
+    public class ModuleSearcher : LocalService
     {
-        #region SERIALIZABLE FIELD API
+        #region LOCAL SERVICE API
 
-        [Title("Configuration")]
-        [Tooltip("Radius for searching modules.")]
-        [SerializeField] private float radius;
-        [Tooltip("The layer mask of modules to search for.")]
-        [SerializeField] private LayerMask target;
+        private Transform _transform;
 
         #endregion
 
-        private readonly List<Collider2D> _buffer = new List<Collider2D>();
-        private ContactFilter2D _filter = new ContactFilter2D();
+        private readonly float _radius;
 
-#if UNITY_EDITOR
+        private List<Collider2D> _buffer = new List<Collider2D>();
+        private readonly ContactFilter2D _filter = new ContactFilter2D();
 
-        private readonly DebugInformation _debug = new DebugInformation();
-
-#endif
-
-        /// <inheritdoc/>
-        public override void Initialize()
+        public ModuleSearcher(float radius, LayerMask target, ServiceResolver resolver) : base(resolver)
         {
             Console.LogProgress();
 
+            _transform = resolver.GetLocalService<ModuleTransformResolver>().Main;
+
+            _radius = radius;
+
             _filter.useLayerMask = true;
             _filter.layerMask = target;
+        }
 
-            base.Initialize();
+        public override void Dispose()
+        {
+            Console.LogProgress();
+
+            _buffer.Clear();
+
+            _transform = null;
+
+            _buffer = null;
         }
 
         /// <summary>
@@ -53,17 +52,17 @@ namespace Core.Object.Module
         {
 #if UNITY_EDITOR
 
-            _debug.Origin = transform.position;
-            _debug.PositionForModule = null;
-            _debug.PositionsForSlot.Clear();
-            _debug.ColorsForSlot.Clear();
+            CachedGizmosInformation.MainPosition = _transform.position;
+            CachedGizmosInformation.PositionForModule = null;
+            CachedGizmosInformation.PositionsForSlot.Clear();
+            CachedGizmosInformation.ColorsForSlot.Clear();
 
 #endif
 
-            var x = transform.position.x;
-            var y = transform.position.y;
+            var x = _transform.position.x;
+            var y = _transform.position.y;
             var origin = new Vector2(x, y);
-            var count = Physics2D.OverlapCircle(origin, radius, _filter, _buffer);
+            var count = Physics2D.OverlapCircle(origin, _radius, _filter, _buffer);
 
             Collider2D buffer = null;
             var cache = float.MaxValue;
@@ -71,7 +70,7 @@ namespace Core.Object.Module
             for (var i = 0; i < count; i++)
             {
                 // Excludes self from search results.
-                if (_buffer[i].transform == transform.parent)
+                if (_buffer[i].transform == _transform.parent)
                 {
                     continue;
                 }
@@ -96,14 +95,14 @@ namespace Core.Object.Module
 
 #if UNITY_EDITOR
 
-            _debug.PositionForModule = buffer.transform.position;
-            _debug.ColorForModule = Color.magenta;
+            CachedGizmosInformation.PositionForModule = buffer.transform.position;
+            CachedGizmosInformation.ColorForModule = Color.magenta;
 
 #endif
 
             // Get the slots attached to the found module.
-            var connector = buffer.GetComponentInChildren<ModuleConnector>();
-            var slots = connector.Slots;
+            var socket = buffer.GetComponentInChildren<ModuleSocket>();
+            var slots = socket.Slots;
 
             Slot slot = null;
             cache = float.MaxValue;
@@ -117,15 +116,15 @@ namespace Core.Object.Module
                 var distance = Vector2.Distance(origin, position);
 
                 // Excludes slots beyond the search radius.
-                if (distance > radius)
+                if (distance > _radius)
                 {
                     continue;
                 }
 
 #if UNITY_EDITOR
 
-                _debug.PositionsForSlot.Add(position);
-                _debug.ColorsForSlot.Add(slots[i].State == SlotState.Attachable ? Color.yellow : Color.red);
+                CachedGizmosInformation.PositionsForSlot.Add(position);
+                CachedGizmosInformation.ColorsForSlot.Add(slots[i].State == SlotState.Attachable ? Color.yellow : Color.red);
 
 #endif
 
@@ -150,112 +149,28 @@ namespace Core.Object.Module
 
 #if UNITY_EDITOR
 
-            count = _debug.PositionsForSlot.Count;
+            count = CachedGizmosInformation.PositionsForSlot.Count;
             for (var i = 0; i < count; i++)
             {
-                if (_debug.PositionsForSlot[i] != slot.transform.position)
+                if (CachedGizmosInformation.PositionsForSlot[i] != slot.transform.position)
                 {
                     continue;
                 }
 
-                _debug.PositionsForSlot[i] = slot.transform.position;
-                _debug.ColorsForSlot[i] = Color.green;
+                CachedGizmosInformation.PositionsForSlot[i] = slot.transform.position;
+                CachedGizmosInformation.ColorsForSlot[i] = Color.green;
             }
 
 #endif
 
-            return new SearchedSlotResult(radius, connector, slot);
+            return new SearchedSlotResult(socket, slot);
         }
+
+        public float Radius => _radius;
 
 #if UNITY_EDITOR
 
-        private void OnDrawGizmosSelected()
-        {
-            // Draws the search radius boundary.
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawWireSphere(transform.position, radius);
-
-            // Draws a line toward the found module.
-            var color = _debug.ColorForModule;
-            var origin = _debug.Origin;
-            var position = _debug.PositionForModule;
-            if (position != null)
-            {
-                Gizmos.color = color;
-                Gizmos.DrawLine(origin, position.Value);
-            }
-
-            // Draws lines toward each slot with its attachment state label.
-            var style = new GUIStyle { richText = true };
-            var builder = new LabelBuilder();
-            var count = _debug.PositionsForSlot.Count;
-            for (var i = 0; i < count; i++)
-            {
-                color = _debug.ColorsForSlot[i];
-                position = _debug.PositionsForSlot[i];
-                Gizmos.color = color;
-                Gizmos.DrawLine(origin, position.Value);
-
-                builder.Color = $"#{ColorUtility.ToHtmlStringRGB(color)}";
-                builder.FontSize = 12;
-
-                if (color == Color.red)
-                {
-                    builder.Append("Unavailable");
-                }
-                else if (color == Color.yellow)
-                {
-                    builder.Append("Available");
-                }
-                else
-                {
-                    builder.Append("Connected");
-                }
-
-                UnityEditor.Handles.Label(position.Value, builder.ToString(), style);
-
-                builder.Clear();
-            }
-        }
-
-#endif
-
-#if UNITY_EDITOR
-
-        #region UNITY EDITOR DEBUG API
-
-        /// <summary>
-        /// Editor-only. Holds information used for visual debugging in the Unity Editor.
-        /// </summary>
-        private class DebugInformation
-        {
-            /// <summary>
-            /// The position of this object.
-            /// </summary>
-            public Vector3 Origin { get; set; }
-
-            /// <summary>
-            /// The position of the found module GameObject.
-            /// </summary>
-            public Vector3? PositionForModule { get; set; }
-
-            /// <summary>
-            /// The color used to indicate the found module.
-            /// </summary>
-            public Color ColorForModule { get; set; }
-
-            /// <summary>
-            /// The positions of the slots attached to the found module.
-            /// </summary>
-            public List<Vector3> PositionsForSlot { get; } = new List<Vector3>();
-
-            /// <summary>
-            /// The colors used to indicate the attachment state of each slot.
-            /// </summary>
-            public List<Color> ColorsForSlot { get; } = new List<Color>();
-        }
-
-        #endregion
+        public SearchedModuleGizmosInformation CachedGizmosInformation { get; } = new SearchedModuleGizmosInformation();
 
 #endif
     }

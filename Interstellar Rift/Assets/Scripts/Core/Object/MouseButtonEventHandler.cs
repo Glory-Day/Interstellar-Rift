@@ -9,15 +9,24 @@ namespace Core.Object
     /// <summary>
     /// A local service that detects when the mouse pointer enters or exits the module, re-raising Unity's pointer events as subscribable events.
     /// </summary>
-    public class MouseButtonEventHandler : LocalServiceBehaviour, IPointerUpHandler, IPointerDownHandler, IDragHandler
+    public class MouseButtonEventHandler : LocalClientBehaviour, IPointerUpHandler, IPointerDownHandler, IDragHandler
     {
+        private MouseButtonEventDispatcher _mouseButtonEventDispatcher;
+
+        public override void Install()
+        {
+            Console.LogProgress();
+
+            _mouseButtonEventDispatcher = Resolver.GetLocalService<MouseButtonEventDispatcher>();
+
+            base.Install();
+        }
+
         private void OnDestroy()
         {
             Console.LogProgress();
 
-            OnMouseButtonPressed = null;
-            OnMouseButtonReleased = null;
-            OnMouseButtonDragged = null;
+            _mouseButtonEventDispatcher = null;
         }
 
         /// <summary>
@@ -28,7 +37,7 @@ namespace Core.Object
         {
             Console.LogEventMessage("Mouse button is released.");
 
-            OnMouseButtonReleased?.Invoke(eventData);
+            _mouseButtonEventDispatcher.ReleaseMouseButton(eventData);
         }
 
         /// <summary>
@@ -39,7 +48,7 @@ namespace Core.Object
         {
             Console.LogEventMessage("Mouse button is pressed.");
 
-            OnMouseButtonPressed?.Invoke(eventData);
+            _mouseButtonEventDispatcher.PressMouseButton(eventData);
         }
 
         /// <summary>
@@ -48,22 +57,7 @@ namespace Core.Object
         /// <param name="eventData">The event data associated with the drag event.</param>
         public void OnDrag(PointerEventData eventData)
         {
-            OnMouseButtonDragged?.Invoke(eventData);
+            _mouseButtonEventDispatcher.DragMouseButton(eventData);
         }
-
-        /// <summary>
-        /// Occurs when the mouse button is pressed over the module.
-        /// </summary>
-        public event Action<PointerEventData> OnMouseButtonPressed;
-
-        /// <summary>
-        /// Occurs when the mouse button is released over the module.
-        /// </summary>
-        public event Action<PointerEventData> OnMouseButtonReleased;
-
-        /// <summary>
-        /// Occurs every frame while the module is being dragged.
-        /// </summary>
-        public event Action<PointerEventData> OnMouseButtonDragged;
     }
 }

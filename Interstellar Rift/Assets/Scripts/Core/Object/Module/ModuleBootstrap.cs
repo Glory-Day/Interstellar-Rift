@@ -1,36 +1,47 @@
 using Core.Object.Service;
+using Core.Utility.Exception;
+using Core.Utility.Extension;
+
 using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module
 {
     public class ModuleBootstrap : IBootable
     {
-        private readonly ModuleModel _model;
+        protected readonly ModuleBootstrapConfiguration Configuration;
 
-        private readonly ServiceResolver _resolver;
-
-        protected ModuleBootstrap(ModuleModel model, ServiceResolver resolver)
+        protected ModuleBootstrap(ModuleBootstrapConfiguration configuration)
         {
-            _model = model;
-            _resolver = resolver;
+            Console.LogProgress();
+
+            Configuration = configuration;
         }
 
         public virtual void Boot()
         {
             Console.LogProgress();
 
-            var rank = _model.Rank;
+            try
+            {
+                var resolver = new ServiceResolverFactory(Configuration).Create();
 
-            IInitializable initializer = new ModuleLocalServiceInitializer(_resolver);
-            initializer.Initialize();
+                var clone = Configuration.Clone;
+                var initializer = clone.GetComponentInChildren<LocalClientInitializer>();
+                initializer.Initialize(resolver);
 
-            var updateEventHandler = _resolver.GetGlobalService<UpdateEventHandler>();
-            var factory = new ColorApplicatorFactory(rank, updateEventHandler);
-            var applicator = factory.Create();
+                var drawer = resolver.GetLocalService<ModuleTextureDrawer>();
+                drawer.Draw();
 
-            var renderer = _resolver.GetLocalService<ModuleTextureRenderer>();
-            renderer.Applicator = applicator;
-            renderer.Draw();
+                Console.LogSuccess("Module".ToBoldStyle() + "is booting completed.");
+            }
+            catch (MissingRequiredGlobalServiceException exception)
+            {
+                Console.LogError(exception.Message);
+            }
+            catch (MissingRequiredLocalServiceException exception)
+            {
+                Console.LogError(exception.Message);
+            }
         }
     }
 }
