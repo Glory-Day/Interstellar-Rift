@@ -17,5 +17,7 @@ namespace Core.Object.Module
 
             return new ModuleDragEventHandler(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Lazy;
     }
 }

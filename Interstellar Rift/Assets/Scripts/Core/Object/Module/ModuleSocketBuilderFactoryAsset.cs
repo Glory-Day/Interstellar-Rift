@@ -7,7 +7,7 @@ namespace Core.Object.Module
 {
     [CreateAssetMenu(fileName = "Module Socket Builder Factory Asset",
                      menuName = "Assets/Services/Local/Module Socket Builder")]
-    public class ModuleSocketBuilderFactoryAsset : LocalServiceFactoryAsset
+    public class ModuleSocketBuilderFactoryAsset : LocalServiceBuilderFactoryAsset
     {
         public override LocalService Create(ServiceResolver resolver)
         {
@@ -17,5 +17,7 @@ namespace Core.Object.Module
 
             return new ModuleSocketBuilder(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

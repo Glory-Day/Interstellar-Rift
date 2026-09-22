@@ -1,6 +1,7 @@
 using Core.Object.Service;
 using Core.Utility.Exception;
 using Core.Utility.Extension;
+using UnityEngine;
 
 using Console = GloryDay.Debug.Console;
 
@@ -8,13 +9,13 @@ namespace Core.Object.Module
 {
     public class ModuleBootstrap : IBootable
     {
-        protected readonly ModuleBootstrapConfiguration Configuration;
+        private readonly ModuleBootstrapConfiguration _configuration;
 
         protected ModuleBootstrap(ModuleBootstrapConfiguration configuration)
         {
             Console.LogProgress();
 
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
         public virtual void Boot()
@@ -23,16 +24,21 @@ namespace Core.Object.Module
 
             try
             {
-                var resolver = new ServiceResolverFactory(Configuration).Create();
+                var clone = _configuration.Clone;
+                var initializer = clone.GetComponentInChildren<LocalServiceInstallationRunner>();
+                var resolver = new ServiceResolverFactory(initializer, _configuration).Create();
 
-                var clone = Configuration.Clone;
-                var initializer = clone.GetComponentInChildren<LocalClientInitializer>();
-                initializer.Initialize(resolver);
+                var registry = resolver.GetGlobalService<LocalServiceRepository>();
+                var collider2Ds = clone.GetComponentsInChildren<Collider2D>();
+                foreach (var collider2D in collider2Ds)
+                {
+                    registry.Register(collider2D, resolver);
+                }
 
                 var drawer = resolver.GetLocalService<ModuleTextureDrawer>();
                 drawer.Draw();
 
-                Console.LogSuccess("Module".ToBoldStyle() + "is booting completed.");
+                Console.LogSuccess("Module".ToBoldStyle() + " is booting completed.");
             }
             catch (MissingRequiredGlobalServiceException exception)
             {

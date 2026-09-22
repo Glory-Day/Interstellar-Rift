@@ -1,3 +1,4 @@
+using System;
 using Core.Object.Service;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Core.Object.Module
     /// <summary>
     /// Controls the visual effect of an electric arc, using the configured settings to keep its curvature and jitter looking visually natural.
     /// </summary>
-    public class ElectricArcVisualEffectInitializer : LocalClientBehaviour
+    public class ElectricArcVisualEffectInstaller : LocalServiceInstallationBehaviour
     {
         #region SERIALIZABLE FIELD API
 
@@ -27,6 +28,13 @@ namespace Core.Object.Module
         private ElectricArcVisualEffect _electricArcVisualEffect;
 
         #endregion
+
+        private void OnDestroy()
+        {
+            Console.LogProgress();
+
+            _electricArcVisualEffect = null;
+        }
 
 #if UNITY_EDITOR
 

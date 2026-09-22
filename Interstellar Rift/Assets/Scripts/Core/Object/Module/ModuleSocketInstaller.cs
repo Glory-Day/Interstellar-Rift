@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Core.Object.Module
 {
-    public class ModuleSocketInitializer : LocalClientBehaviour
+    public class ModuleSocketInstaller : LocalServiceInstallationBehaviour
     {
         #region SERIALIZABLE FIELD API
 
@@ -25,6 +25,13 @@ namespace Core.Object.Module
 
         #endregion
 
+        public void OnDestroy()
+        {
+            Console.LogProgress();
+
+            _moduleSocket = null;
+        }
+
         public override void Install()
         {
             Console.LogProgress();
@@ -38,14 +45,6 @@ namespace Core.Object.Module
             installer.Install(_moduleSocket);
 
             base.Install();
-        }
-
-        public void OnDestroy()
-        {
-            Console.LogProgress();
-
-            _moduleSocket.Dispose();
-            _moduleSocket = null;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Core.Object.Service
 {
     [CreateAssetMenu(fileName = "Dynamic Local Service Installer Builder Factory Asset",
                      menuName = "Assets/Services/Local/Dynamic Local Service Installer Builder")]
-    public class DynamicLocalServiceInstallerBuilderFactoryAsset : LocalServiceFactoryAsset
+    public class DynamicLocalServiceInstallerBuilderFactoryAsset : LocalServiceBuilderFactoryAsset
     {
         public override LocalService Create(ServiceResolver resolver)
         {
@@ -16,5 +16,7 @@ namespace Core.Object.Service
 
             return new DynamicLocalServiceInstallerBuilder(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Manual;
     }
 }

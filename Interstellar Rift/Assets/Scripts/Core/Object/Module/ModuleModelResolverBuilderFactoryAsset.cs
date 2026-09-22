@@ -7,7 +7,7 @@ namespace Core.Object.Module
 {
     [CreateAssetMenu(fileName = "Module Model Resolver Builder Factory Asset",
                      menuName = "Assets/Services/Local/Module Model Resolver Builder")]
-    public class ModuleModelResolverBuilderFactoryAsset : LocalServiceFactoryAsset
+    public class ModuleModelResolverBuilderFactoryAsset : LocalServiceBuilderFactoryAsset
     {
         public override LocalService Create(ServiceResolver resolver)
         {
@@ -17,5 +17,7 @@ namespace Core.Object.Module
 
             return new ModuleModelResolverBuilder(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Manual;
     }
 }

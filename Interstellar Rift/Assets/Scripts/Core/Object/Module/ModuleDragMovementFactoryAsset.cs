@@ -26,5 +26,7 @@ namespace Core.Object.Module
 
             return new ModuleDragMovement(speed, resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Lazy;
     }
 }

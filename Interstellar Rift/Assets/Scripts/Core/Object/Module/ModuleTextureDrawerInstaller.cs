@@ -9,7 +9,7 @@ namespace Core.Object.Module
     /// <summary>
     /// A service that assigns a color based on the module's rank and renders that color onto its texture.
     /// </summary>
-    public class ModuleTextureDrawerInitializer : LocalClientBehaviour
+    public class ModuleTextureDrawerInstaller : LocalServiceInstallationBehaviour
     {
         #region SERIALIZABLE FIELD API
 

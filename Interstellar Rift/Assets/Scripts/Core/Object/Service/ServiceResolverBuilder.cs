@@ -32,12 +32,12 @@ namespace Core.Object.Service
 
             if (_resolver == null)
             {
-                throw new MissingRequiredComponentException(nameof(IObjectResolver));
+                throw new MissingRequiredComponentException(GetType(), nameof(IObjectResolver));
             }
 
             if (_container == null)
             {
-                throw new MissingRequiredComponentException(nameof(List<LocalService>));
+                throw new MissingRequiredComponentException(GetType(), nameof(List<LocalService>));
             }
 
             Console.LogSuccess($"{nameof(ServiceResolver).ToNicifyPascalCase().ToBoldStyle()} is built.");

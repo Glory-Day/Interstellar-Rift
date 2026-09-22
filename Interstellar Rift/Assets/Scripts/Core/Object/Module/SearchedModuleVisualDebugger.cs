@@ -1,13 +1,14 @@
 #if UNITY_EDITOR
 
+using System;
 using Core.Object.Service;
-using GloryDay.Debug;
 using GloryDay.Debug.Gizmos;
 using UnityEngine;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module
 {
-    public class SearchedModuleVisualDebugger : LocalClientBehaviour
+    public class SearchedModuleVisualDebugger : LocalServiceInstallationBehaviour
     {
         #region LOCAL SERVICE API
 
@@ -23,6 +24,15 @@ namespace Core.Object.Module
 
             base.Install();
         }
+
+        private void OnDestroy()
+        {
+            Console.LogProgress();
+
+            _moduleSearcher = null;
+        }
+
+#if UNITY_EDITOR
 
         private void OnDrawGizmosSelected()
         {
@@ -80,6 +90,8 @@ namespace Core.Object.Module
                 builder.Clear();
             }
         }
+
+#endif
     }
 }
 

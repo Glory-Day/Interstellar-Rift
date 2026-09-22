@@ -1,3 +1,4 @@
+using Core.Utility;
 using Core.Utility.Extension;
 using GloryDay.Debug;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Core.Object.Service
     {
         private readonly GameObject _gameObject;
 
-        public ActivatableLocalService(GameObject gameObject, ServiceResolver resolver) : base(resolver)
+        protected ActivatableLocalService(GameObject gameObject, ServiceResolver resolver) : base(resolver)
         {
             Console.LogProgress();
 

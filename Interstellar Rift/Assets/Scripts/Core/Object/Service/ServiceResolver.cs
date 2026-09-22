@@ -9,7 +9,7 @@ namespace Core.Object.Service
     /// <summary>
     /// Resolves registered local services from a serialized list and global services registered with DI via VContainer.
     /// </summary>
-    public class ServiceResolver
+    public class ServiceResolver : IGlobalServiceResolver, ILocalServiceResolver
     {
         private readonly IReadOnlyList<LocalService> _services;
         private readonly IObjectResolver _resolver;

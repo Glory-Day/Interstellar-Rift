@@ -28,5 +28,7 @@ namespace Core.Object.Module
 
             return new ModuleSearcher(radius, target, resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

@@ -1,3 +1,6 @@
+using System;
+using Core.Utility.Extension;
+
 namespace Core.Utility.Exception
 {
     /// <summary>
@@ -7,21 +10,21 @@ namespace Core.Utility.Exception
     public sealed class MissingRequiredComponentException : System.Exception
     {
         /// <inheritdoc/>
-        public MissingRequiredComponentException(string componentName)
-            : base($"Required component '{componentName}' was not provided before Build() was called.")
+        public MissingRequiredComponentException(Type type, string componentName)
+            : base($"Required component '{componentName.ToBoldStyle().ToNicifyPascalCase()}' was not provided before {type.Name.ToBoldStyle().ToNicifyPascalCase()}")
         {
             ComponentName = componentName;
         }
 
         /// <inheritdoc/>
-        public MissingRequiredComponentException(string componentName, string message)
+        public MissingRequiredComponentException(Type type, string componentName, string message)
             : base(message)
         {
             ComponentName = componentName;
         }
 
         /// <inheritdoc/>
-        public MissingRequiredComponentException(string componentName, string message, System.Exception innerException)
+        public MissingRequiredComponentException(Type type, string componentName, string message, System.Exception innerException)
             : base(message, innerException)
         {
             ComponentName = componentName;

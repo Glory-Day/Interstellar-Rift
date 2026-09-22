@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Utility;
 using Core.Utility.Extension;
 using Console = GloryDay.Debug.Console;
 
@@ -8,17 +9,17 @@ namespace Core.Object.Service
 {
     public class LocalServiceRegistry
     {
-        private readonly List<LocalServiceFactoryAsset> _assets;
+        private readonly LocalServiceInstallationQueue _queue;
         private readonly List<LocalService> _container;
         private readonly ServiceResolver _resolver;
 
-        public LocalServiceRegistry(List<LocalServiceFactoryAsset> assets,
+        public LocalServiceRegistry(LocalServiceInstallationQueue queue,
                                     List<LocalService> container,
                                     ServiceResolver resolver)
         {
             Console.LogProgress();
 
-            _assets = assets;
+            _queue = queue;
             _container = container;
             _resolver = resolver;
         }
@@ -27,8 +28,7 @@ namespace Core.Object.Service
         {
             Console.LogProgress();
 
-            var factory = _assets.OfType<T>().FirstOrDefault();
-            if (factory is null)
+            if (_queue.TryTakeManualInstallationAsset<T>(out var factory) is false)
             {
                 return false;
             }
@@ -36,27 +36,33 @@ namespace Core.Object.Service
             var service = action.Invoke(factory);
             _container.Add(service);
 
-            _assets.Remove(factory);
-
             Console.LogSuccess($"{service.GetType().Name.ToNicifyPascalCase().ToBoldStyle()} is registered.");
 
             return true;
         }
 
-        public void RegisterAll()
+        public void RegisterAllAsAutomatically()
         {
-            var count = _assets.Count;
-            for (var i = 0; i < count; i++)
+            Console.LogProgress();
+
+            while (_queue.TryTakeAutomaticInstallationAsset(out var factory))
             {
-                var factory = _assets[i];
                 var service = factory.Create(_resolver);
+                _container.Add(service);
 
                 Console.LogSuccess($"{service.GetType().Name.ToNicifyPascalCase().ToBoldStyle()} is registered.");
-
-                _container.Add(service);
             }
+        }
 
-            _assets.Clear();
+        public void RegisterAllAsLazy()
+        {
+            while (_queue.TryTakeLazyInstallationAsset(out var factory))
+            {
+                var service = factory.Create(_resolver);
+                _container.Add(service);
+
+                Console.LogSuccess($"{service.GetType().Name.ToNicifyPascalCase().ToBoldStyle()} is registered.");
+            }
         }
     }
 }

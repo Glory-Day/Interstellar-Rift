@@ -64,12 +64,12 @@ namespace Core.Object.Module
 
             if (_transforms == null)
             {
-                throw new MissingRequiredComponentException(nameof(Transform));
+                throw new MissingRequiredComponentException(GetType(), nameof(Transform));
             }
 
             if (_gameObject == null)
             {
-                throw new MissingRequiredComponentException(nameof(GameObject));
+                throw new MissingRequiredComponentException(GetType(), nameof(GameObject));
             }
 
             Console.LogSuccess($"{nameof(ElectricArcVisualEffect).ToNicifyPascalCase().ToBoldStyle()} is built.");

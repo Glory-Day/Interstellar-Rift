@@ -1,3 +1,4 @@
+using Core.Object.Module;
 using Core.Utility.Pool;
 using GloryDay.Debug;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace Core.Object.Service
             builder.RegisterComponentInHierarchy<Camera>();
             builder.RegisterComponentInHierarchy<UpdateEventHandler>();
 
-            Console.LogSuccess("<b>Global Service</b> is installed");
+            Console.LogSuccess("<b>Module Service</b> is installed");
         }
     }
 }

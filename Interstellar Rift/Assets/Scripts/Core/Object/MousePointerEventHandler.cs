@@ -9,7 +9,7 @@ namespace Core.Object
     /// <summary>
     /// A local service that detects when the mouse pointer enters or exits the module, re-raising Unity's pointer events as subscribable events.
     /// </summary>
-    public class MousePointerEventHandler : LocalClientBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public class MousePointerEventHandler : LocalServiceInstallationBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         private MousePointerEventDispatcher _mousePointerEventDispatcher;
 

@@ -7,7 +7,7 @@ using Console = GloryDay.Debug.Console;
 
 namespace Core.Object
 {
-    [CreateAssetMenu(fileName = "Update Event Dispatcher Factory Asset",
+    [CreateAssetMenu(fileName = "Update Event Dispatcher Registrar Asset",
                      menuName = "Assets/Services/Global/Update Event Dispatcher")]
     public class UpdateEventDispatcherRegistrarAsset : GlobalServiceRegistrarAsset
     {

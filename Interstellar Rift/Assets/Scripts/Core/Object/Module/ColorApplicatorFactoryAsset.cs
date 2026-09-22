@@ -46,5 +46,7 @@ namespace Core.Object.Module
 
             return service;
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

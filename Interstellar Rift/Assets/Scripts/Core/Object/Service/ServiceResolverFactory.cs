@@ -9,15 +9,18 @@ namespace Core.Object.Service
 {
     public class ServiceResolverFactory : IFactory<ServiceResolver>
     {
+        private readonly LocalServiceInstallationRunner _runner;
         private readonly ModuleBootstrapConfiguration _configuration;
 
         private List<LocalService> _container;
         private ServiceResolver _resolver;
 
-        public ServiceResolverFactory(ModuleBootstrapConfiguration configuration)
+        public ServiceResolverFactory(LocalServiceInstallationRunner runner,
+                                      ModuleBootstrapConfiguration configuration)
         {
             Console.LogProgress();
 
+            _runner = runner;
             _configuration = configuration;
         }
 
@@ -40,7 +43,11 @@ namespace Core.Object.Service
             registry.TryRegisterByType<ModuleTransformResolverBuilderFactoryAsset>(CreateModuleTransformResolver);
             registry.TryRegisterByType<ModuleModelResolverBuilderFactoryAsset>(CreateModuleModelResolver);
 
-            registry.RegisterAll();
+            registry.RegisterAllAsAutomatically();
+
+            _runner.Install(_resolver);
+
+            registry.RegisterAllAsLazy();
 
             Console.LogSuccess($"{nameof(ServiceResolver).ToNicifyPascalCase().ToBoldStyle()} is created.");
 

@@ -47,6 +47,8 @@ namespace Core.Object.Module
         /// <param name="result">The target slot search result the arc should connect to.</param>
         public void StartVisualEffect(Vector3 spawner, SearchedSlotResult result)
         {
+            Console.LogProgress();
+
             _electricArcVisualEffect.UpdateTargetPoint(spawner, result);
             _electricArcVisualEffect.UpdateMiddlePoints();
             _electricArcVisualEffect.Enable();
@@ -71,6 +73,8 @@ namespace Core.Object.Module
         /// </summary>
         public void StopVisualEffect()
         {
+            Console.LogProgress();
+
             _electricArcVisualEffect.Disable();
 
             _updateEventDispatcher.OnUpdate -= _electricArcVisualEffect.UpdateMiddlePoints;

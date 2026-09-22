@@ -7,7 +7,7 @@ namespace Core.Object.Module
 {
     [CreateAssetMenu(fileName = "Module Texture Drawer Builder Factory Asset",
                      menuName = "Assets/Services/Local/Module Texture Drawer Builder")]
-    public class ModuleTextureDrawerBuilderFactoryAsset : LocalServiceFactoryAsset
+    public class ModuleTextureDrawerBuilderFactoryAsset : LocalServiceBuilderFactoryAsset
     {
         public override LocalService Create(ServiceResolver resolver)
         {
@@ -17,5 +17,7 @@ namespace Core.Object.Module
 
             return new ModuleTextureDrawerBuilder(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

@@ -496,9 +496,7 @@ MonoBehaviour:
     database: {fileID: 11400000, guid: 7286d2fa7201d2347aabec8695244010, type: 2}
     spawner: {fileID: 1609224240}
     services: {fileID: 11400000, guid: ffbe1ab2841e1654f9c42827f790b7df, type: 2}
-  assets:
-  - asset: {fileID: 2068069333889340005, guid: c017ae04305ea5a41be529d0b064f86e, type: 3}
-    count: 1
+  assets: []
 --- !u!4 &1264724261
 Transform:
   m_ObjectHideFlags: 0

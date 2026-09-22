@@ -10,6 +10,12 @@ namespace Core.Object.Module
     /// </summary>
     public class ModuleSearcher : LocalService
     {
+        #region GLOBAL SERVICE API
+
+        private LocalServiceRepository _localServiceRepository;
+
+        #endregion
+
         #region LOCAL SERVICE API
 
         private Transform _transform;
@@ -25,6 +31,8 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
+            _localServiceRepository = resolver.GetGlobalService<LocalServiceRepository>();
+
             _transform = resolver.GetLocalService<ModuleTransformResolver>().Main;
 
             _radius = radius;
@@ -38,6 +46,8 @@ namespace Core.Object.Module
             Console.LogProgress();
 
             _buffer.Clear();
+
+            _localServiceRepository = null;
 
             _transform = null;
 
@@ -70,7 +80,7 @@ namespace Core.Object.Module
             for (var i = 0; i < count; i++)
             {
                 // Excludes self from search results.
-                if (_buffer[i].transform == _transform.parent)
+                if (_buffer[i].transform == _transform)
                 {
                     continue;
                 }
@@ -101,7 +111,7 @@ namespace Core.Object.Module
 #endif
 
             // Get the slots attached to the found module.
-            var socket = buffer.GetComponentInChildren<ModuleSocket>();
+            var socket = _localServiceRepository.Fetch(buffer).GetLocalService<ModuleSocket>();
             var slots = socket.Slots;
 
             Slot slot = null;

@@ -519,8 +519,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b2e38fb684d4714b999001470c251d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slots: []
-  joint: {fileID: 0}
+  slots:
+  - {fileID: 665074515132566830}
+  - {fileID: 5858862120364088565}
+  - {fileID: 2947345892026036747}
+  joint: {fileID: 930010328514523922}
 --- !u!114 &8254188802734307307
 MonoBehaviour:
   m_ObjectHideFlags: 0

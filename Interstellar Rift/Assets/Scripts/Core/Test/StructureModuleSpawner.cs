@@ -2,12 +2,11 @@
 
 using Core.Object.Module;
 using Core.Object.Module.Structure;
-using Core.Object.Service;
+using Core.Utility.Extension;
 using Core.Utility.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 using Console = GloryDay.Debug.Console;
 
@@ -69,11 +68,9 @@ namespace Core.Test
                 };
 
                 _objectPool.Register(configuration);
+                _objectPool.GetContainer(asset);
 
-                var container = _objectPool.GetContainer(asset);
-                container.OnAfterCreated += InstallServices;
-
-                Console.LogSuccess($"{asset.name} is successfully spawned.");
+                Console.LogSuccess($"{asset.name.ToBoldStyle()} is successfully spawned.");
             }
         }
 
@@ -97,10 +94,9 @@ namespace Core.Test
                 _objectPool.Register(configuration);
 
                 var container = _objectPool.GetContainer(module);
-                container.OnAfterCreated += InstallServices;
                 container.OnAfterCreated += clone => BootStructureModule(clone, testbed);
 
-                Console.LogSuccess($"{module.name} is successfully spawned.");
+                Console.LogSuccess($"{module.name.ToBoldStyle()} is successfully spawned.");
             }
         }
 
@@ -116,17 +112,8 @@ namespace Core.Test
 
                 var clone = _objectPool.Get(module, spawner.position, spawner.rotation);
 
-                Console.LogSuccess($"{clone.name} is successfully spawned.");
+                Console.LogSuccess($"{clone.name.ToBoldStyle()} is successfully spawned.");
             }
-        }
-
-        private void InstallServices(GameObject clone)
-        {
-            Console.LogProgress();
-
-            _resolver.InjectGameObject(clone);
-
-            Console.LogEventMessage("All services are installed.");
         }
 
         private void BootStructureModule(GameObject clone, ModuleSpawnSpecification specification)
@@ -137,7 +124,7 @@ namespace Core.Test
             var bootstrap = new StructureModuleBootstrapFactory(configuration).Create();
             bootstrap.Boot();
 
-            Console.LogEventMessage("Module is booting completely.");
+            Console.LogEventMessage($"{"Module".ToBoldStyle()} is booting completely.");
         }
     }
 }

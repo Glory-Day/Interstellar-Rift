@@ -6,8 +6,13 @@ namespace Core.Object.Service
     /// <summary>
     /// Serves as the base class for services that are available only on specific game objects.
     /// </summary>
-    public abstract class LocalClientBehaviour : ClientBehaviour
+    public abstract class LocalServiceInstallationBehaviour : ServiceInstallationBehaviour, ILocalServiceInstallable
     {
+        public virtual void Install()
+        {
+            Console.LogSuccess($"{GetType().Name.ToNicifyPascalCase().ToBoldStyle()} is installed.");
+        }
+
         /// <summary>
         /// The <see cref="ServiceResolver"/> used to resolve local and global services for this instance.
         /// </summary>
@@ -21,18 +26,18 @@ namespace Core.Object.Service
         public abstract class Friend
         {
             /// <summary>
-            /// Assigns the resolved <see cref="ServiceResolver"/> to a <see cref="LocalClientBehaviour"/> instance.
+            /// Assigns the resolved <see cref="ServiceResolver"/> to a <see cref="LocalServiceInstallationBehaviour"/> instance.
             /// </summary>
-            /// <param name="client">The service instance whose <see cref="Resolver"/> is being set.</param>
+            /// <param name="installer">The service instance whose <see cref="Resolver"/> is being set.</param>
             /// <param name="resolver">The resolver to assign.</param>
-            protected static void Install(LocalClientBehaviour client, ServiceResolver resolver)
+            protected static void Install(LocalServiceInstallationBehaviour installer, ServiceResolver resolver)
             {
                 Console.LogProgress();
 
-                client.Resolver = resolver;
-                client.Install();
+                installer.Resolver = resolver;
+                installer.Install();
 
-                Console.LogSuccess($"{nameof(ServiceResolver).ToNicifyPascalCase().ToBoldStyle()} is installed in {client.GetType().Name.ToNicifyPascalCase().ToBoldStyle()}");
+                Console.LogSuccess($"{nameof(ServiceResolver).ToNicifyPascalCase().ToBoldStyle()} is installed in {installer.GetType().Name.ToNicifyPascalCase().ToBoldStyle()}");
             }
         }
 

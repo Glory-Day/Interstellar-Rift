@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5be1063d0d34bd78ec184372e4e63ca, type: 3}
   m_Name: Module Searcher Factory Asset
   m_EditorClassIdentifier: 
-  radius: 0
+  radius: 5
   target:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64

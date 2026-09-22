@@ -8,7 +8,7 @@ namespace Core.Object.Module
 {
     [CreateAssetMenu(fileName = "Electric Arc Visual Effect Builder Factory Asset",
                      menuName = "Assets/Services/Local/Electric Arc Visual Effect Builder")]
-    public class ElectricArcVisualEffectBuilderFactoryAsset : LocalServiceFactoryAsset
+    public class ElectricArcVisualEffectBuilderFactoryAsset : LocalServiceBuilderFactoryAsset
     {
         #region SERIALIZABLE FIELD API
 
@@ -35,5 +35,7 @@ namespace Core.Object.Module
 
             return new ElectricArcVisualEffectBuilder(amount, speed, range, resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

@@ -2,12 +2,12 @@ using System.Collections.Generic;
 
 namespace Core.Object.Service
 {
-    public class LocalServiceInstaller : LocalClientBehaviour.Friend
+    public class LocalServiceInstaller : LocalServiceInstallationBehaviour.Friend
     {
-        private readonly IReadOnlyList<LocalClientBehaviour> _clients;
+        private readonly IReadOnlyList<LocalServiceInstallationBehaviour> _clients;
         private readonly ServiceResolver _resolver;
 
-        public LocalServiceInstaller(IReadOnlyList<LocalClientBehaviour> clients,
+        public LocalServiceInstaller(IReadOnlyList<LocalServiceInstallationBehaviour> clients,
                                      ServiceResolver resolver)
         {
             _clients = clients;
@@ -15,7 +15,7 @@ namespace Core.Object.Service
         }
 
         /// <summary>
-        /// Initializes every registered local service by assigning it a <see cref="ServiceResolver"/> and calling <see cref="ClientBehaviour.Install"/> on it.
+        /// Initializes every registered local service by assigning it a <see cref="ServiceResolver"/> and calling <see cref="ServiceInstallationBehaviour.Install"/> on it.
         /// </summary>
         public void Install()
         {

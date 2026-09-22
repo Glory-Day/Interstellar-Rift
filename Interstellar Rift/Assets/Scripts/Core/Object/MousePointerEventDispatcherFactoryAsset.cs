@@ -17,5 +17,7 @@ namespace Core.Object
 
             return new MousePointerEventDispatcher(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

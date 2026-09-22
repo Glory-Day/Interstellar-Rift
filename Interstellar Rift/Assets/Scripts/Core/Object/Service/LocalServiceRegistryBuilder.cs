@@ -7,7 +7,7 @@ namespace Core.Object.Service
 {
     public class LocalServiceRegistryBuilder : IBuildable<LocalServiceRegistry>
     {
-        private readonly List<LocalServiceFactoryAsset> _assets;
+        private readonly LocalServiceInstallationQueue _queue;
 
         private List<LocalService> _container;
         private ServiceResolver _resolver;
@@ -16,7 +16,7 @@ namespace Core.Object.Service
         {
             Console.LogProgress();
 
-            _assets = assets;
+            _queue = new LocalServiceInstallationQueue(assets);
         }
 
         public LocalServiceRegistryBuilder WithLocalServiceContainer(List<LocalService> container)
@@ -39,7 +39,7 @@ namespace Core.Object.Service
 
             Console.LogSuccess($"{nameof(LocalServiceRegistry).ToNicifyPascalCase().ToBoldStyle()} is built.");
 
-            return new LocalServiceRegistry(_assets, _container, _resolver);
+            return new LocalServiceRegistry(_queue, _container, _resolver);
         }
     }
 }

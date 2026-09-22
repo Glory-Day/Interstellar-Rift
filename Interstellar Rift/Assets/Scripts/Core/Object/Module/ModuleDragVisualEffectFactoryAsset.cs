@@ -17,5 +17,7 @@ namespace Core.Object.Module
 
             return new ModuleDragVisualEffect(resolver);
         }
+
+        public override InstallationMode Mode => InstallationMode.Lazy;
     }
 }
