@@ -1,4 +1,4 @@
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
@@ -14,7 +14,7 @@ namespace Core.Object.Service
 
             Console.LogSuccess($"{nameof(DynamicLocalServiceInstallerBuilder).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
-            return new DynamicLocalServiceInstallerBuilder(resolver);
+            return new DynamicLocalServiceInstallerBuilder();
         }
 
         public override InstallationMode Mode => InstallationMode.Manual;

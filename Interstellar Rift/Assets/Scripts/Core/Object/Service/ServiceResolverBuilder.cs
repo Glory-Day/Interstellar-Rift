@@ -1,16 +1,17 @@
+using System;
 using System.Collections.Generic;
 using Core.Utility;
-using Core.Utility.Exception;
-using Core.Utility.Extension;
-using GloryDay.Debug;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using VContainer;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Service
 {
-    public class ServiceResolverBuilder : IBuildable<ServiceResolver>
+    public class ServiceResolverBuilder : Builder<ServiceResolver>
     {
         private IObjectResolver _resolver;
-        private List<LocalService> _container;
+        private Dictionary<Type, LocalService> _container;
 
         public ServiceResolverBuilder WithGlobalServices(IObjectResolver resolver)
         {
@@ -19,28 +20,29 @@ namespace Core.Object.Service
             return this;
         }
 
-        public ServiceResolverBuilder WithLocalServiceContainer(List<LocalService> container)
+        public ServiceResolverBuilder WithLocalServiceContainer(Dictionary<Type, LocalService> container)
         {
             _container = container;
 
             return this;
         }
 
-        public ServiceResolver Build()
+        protected override void Validate()
         {
-            Console.LogProgress();
-
             if (_resolver == null)
             {
-                throw new MissingRequiredComponentException(GetType(), nameof(IObjectResolver));
+                throw new MissingBuildComponentException(typeof(ServiceResolver), "Global Services");
             }
 
             if (_container == null)
             {
-                throw new MissingRequiredComponentException(GetType(), nameof(List<LocalService>));
+                throw new MissingBuildComponentException(typeof(ServiceResolver), "Local Service Container");
             }
+        }
 
-            Console.LogSuccess($"{nameof(ServiceResolver).ToNicifyPascalCase().ToBoldStyle()} is built.");
+        protected override ServiceResolver Create()
+        {
+            Console.LogProgress();
 
             return new ServiceResolver(_resolver, _container);
         }

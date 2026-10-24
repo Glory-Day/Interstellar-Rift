@@ -1,5 +1,5 @@
 using System;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module.Structure

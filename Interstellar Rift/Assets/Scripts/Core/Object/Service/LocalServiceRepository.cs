@@ -6,12 +6,20 @@ using VContainer;
 
 namespace Core.Object.Service
 {
-    public class LocalServiceRepository : GlobalService, IRegistrable<Collider2D, ILocalServiceResolver>
+    /// <summary>
+    /// A repository for registering and querying local services associated with key.
+    /// </summary>
+    public class LocalServiceRepository
+        : GlobalService,
+            IRegistry<Collider2D, ILocalServiceResolver>
     {
-        private Dictionary<Collider2D, ILocalServiceResolver> _registry = new Dictionary<Collider2D, ILocalServiceResolver>();
+        private Dictionary<Collider2D, ILocalServiceResolver> _registry =
+            new Dictionary<Collider2D, ILocalServiceResolver>();
 
-        public LocalServiceRepository(IObjectResolver resolver) : base(resolver) { }
+        /// <param name="resolver">The provider of global services installed via VContainer.</param>
+        public LocalServiceRepository() { }
 
+        /// <inheritdoc/>
         public override void Dispose()
         {
             Console.LogProgress();
@@ -20,30 +28,35 @@ namespace Core.Object.Service
             _registry = null;
         }
 
-        public void Register(Collider2D collider, ILocalServiceResolver socket)
+        /// <inheritdoc/>
+        public void Register(Collider2D key, ILocalServiceResolver value)
         {
             Console.LogProgress();
 
-            _registry.Add(collider, socket);
+            _registry.Add(key, value);
         }
 
-        public void UnRegister(Collider2D key)
+        /// <inheritdoc/>
+        public void Unregister(Collider2D key)
         {
             Console.LogProgress();
 
             _registry.Remove(key);
         }
 
+        /// <inheritdoc/>
         public bool ContainsKey(Collider2D key)
         {
             return _registry.ContainsKey(key);
         }
 
+        /// <inheritdoc/>
         public ILocalServiceResolver Fetch(Collider2D key)
         {
             return _registry[key];
         }
 
+        /// <inheritdoc/>
         public bool TryFetch(Collider2D key, out ILocalServiceResolver value)
         {
             return _registry.TryGetValue(key, out value);

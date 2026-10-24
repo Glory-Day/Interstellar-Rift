@@ -1,14 +1,16 @@
+using System;
 using System.Collections.Generic;
-using Core.Utility.Extension;
-using GloryDay.Debug;
+using Core.Utility.Attributes;
+using Core.Utility.Extensions;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Service
 {
     public class DynamicLocalServiceInstaller : LocalService
     {
-        private List<LocalService> _services;
+        private Dictionary<Type, LocalService> _services;
 
-        public DynamicLocalServiceInstaller(List<LocalService> services, ServiceResolver resolver) : base(resolver)
+        public DynamicLocalServiceInstaller(Dictionary<Type, LocalService> services)
         {
             Console.LogProgress();
 
@@ -26,7 +28,10 @@ namespace Core.Object.Service
         {
             Console.LogProgress();
 
-            _services.Add(service);
+            foreach (var type in service.GetType().GetHierarchyWithoutExcluded<ExcludeFromInstallationAttribute>())
+            {
+                _services.Add(type, service);
+            }
 
             Console.LogSuccess($"{service.GetType().Name.ToNicifyPascalCase().ToBoldStyle()} is installed dynamically.");
         }

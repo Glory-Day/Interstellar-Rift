@@ -1,16 +1,17 @@
 using Core.Object.Service;
 using Core.Utility;
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
 namespace Core.Object.Module
 {
-    public class ModuleTransformResolverBuilder : LocalService, IBuildable<ModuleTransformResolver>
+    public class ModuleTransformResolverBuilder : LocalServiceBuilder<ModuleTransformResolver>
     {
         private Transform _mainTransform;
 
-        public ModuleTransformResolverBuilder(ServiceResolver resolver) : base(resolver)
+        public ModuleTransformResolverBuilder()
         {
             Console.LogProgress();
         }
@@ -18,6 +19,8 @@ namespace Core.Object.Module
         public override void Dispose()
         {
             Console.LogProgress();
+
+            base.Dispose();
 
             _mainTransform = null;
         }
@@ -29,13 +32,19 @@ namespace Core.Object.Module
             return this;
         }
 
-        public ModuleTransformResolver Build()
+        protected override void Validate()
+        {
+            if (_mainTransform == null)
+            {
+                throw new MissingBuildComponentException(typeof(ModuleTransformResolver), "Main Transform");
+            }
+        }
+
+        protected override ModuleTransformResolver Create()
         {
             Console.LogProgress();
 
-            Console.LogSuccess($"{nameof(ModuleTransformResolver).ToNicifyPascalCase().ToBoldStyle()} is built.");
-
-            return new ModuleTransformResolver(_mainTransform, Resolver);
+            return new ModuleTransformResolver(_mainTransform);
         }
     }
 }

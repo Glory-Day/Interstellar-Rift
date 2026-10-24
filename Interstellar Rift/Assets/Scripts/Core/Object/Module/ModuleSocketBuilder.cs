@@ -1,24 +1,35 @@
 using System.Collections.Generic;
 using Core.Object.Service;
 using Core.Utility;
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
 using GloryDay.Debug;
+using UnityEngine;
 
 namespace Core.Object.Module
 {
-    public class ModuleSocketBuilder : LocalService, IBuildable<ModuleSocket>
+    public class ModuleSocketBuilder : LocalServiceBuilder<ModuleSocket>
     {
+        #region LOCAL SERVICE API
+
+        private Transform _transform;
+
+        #endregion
+
         private List<Slot> _slots;
         private Slot _joint;
 
-        public ModuleSocketBuilder(ServiceResolver resolver) : base(resolver)
+        public ModuleSocketBuilder(Transform transform)
         {
             Console.LogProgress();
+
+            _transform = transform;
         }
 
         public override void Dispose()
         {
             Console.LogProgress();
+
+            base.Dispose();
 
             _slots = null;
             _joint = null;
@@ -38,13 +49,19 @@ namespace Core.Object.Module
             return this;
         }
 
-        public ModuleSocket Build()
+        protected override void Validate()
+        {
+            if (_slots == null)
+            {
+                throw new MissingBuildComponentException(typeof(ModuleSocket), "Slots");
+            }
+        }
+
+        protected override ModuleSocket Create()
         {
             Console.LogProgress();
 
-            Console.LogSuccess($"{nameof(ModuleSocket).ToNicifyPascalCase().ToBoldStyle()} is built.");
-
-            return new ModuleSocket(_slots, _joint, Resolver);
+            return new ModuleSocket(_slots, _joint, _transform);
         }
     }
 }

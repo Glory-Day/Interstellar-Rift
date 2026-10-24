@@ -18,24 +18,31 @@ namespace Core.Object.Module
 
         #region LOCAL SERVICE API
 
+        private ModuleSocket _moduleSocket;
+
         private Transform _transform;
 
         #endregion
 
-        private readonly float _radius;
+        private readonly float _range;
 
         private List<Collider2D> _buffer = new List<Collider2D>();
         private readonly ContactFilter2D _filter = new ContactFilter2D();
 
-        public ModuleSearcher(float radius, LayerMask target, ServiceResolver resolver) : base(resolver)
+        public ModuleSearcher(float range, LayerMask target,
+                              LocalServiceRepository localServiceRepository,
+                              ModuleSocket moduleSocket,
+                              Transform transform)
         {
             Console.LogProgress();
 
-            _localServiceRepository = resolver.GetGlobalService<LocalServiceRepository>();
+            _localServiceRepository = localServiceRepository;
 
-            _transform = resolver.GetLocalService<ModuleTransformResolver>().Main;
+            _moduleSocket = moduleSocket;
 
-            _radius = radius;
+            _transform = transform;
+
+            _range = range;
 
             _filter.useLayerMask = true;
             _filter.layerMask = target;
@@ -45,12 +52,13 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
-            _buffer.Clear();
-
             _localServiceRepository = null;
+
+            _moduleSocket = null;
 
             _transform = null;
 
+            _buffer.Clear();
             _buffer = null;
         }
 
@@ -67,91 +75,71 @@ namespace Core.Object.Module
             CachedGizmosInformation.PositionsForSlot.Clear();
             CachedGizmosInformation.ColorsForSlot.Clear();
 
-#endif
-
-            var x = _transform.position.x;
-            var y = _transform.position.y;
-            var origin = new Vector2(x, y);
-            var count = Physics2D.OverlapCircle(origin, _radius, _filter, _buffer);
-
-            Collider2D buffer = null;
-            var cache = float.MaxValue;
-
-            for (var i = 0; i < count; i++)
-            {
-                // Excludes self from search results.
-                if (_buffer[i].transform == _transform)
-                {
-                    continue;
-                }
-
-                x = _buffer[i].transform.position.x;
-                y = _buffer[i].transform.position.y;
-                var position = new Vector2(x, y);
-                var distance = Vector2.Distance(origin, position);
-
-                if (distance < cache)
-                {
-                    buffer = _buffer[i];
-                    cache = distance;
-                }
-            }
-
-            // Returns null if no module is found.
-            if (buffer == null)
-            {
-                return null;
-            }
-
-#if UNITY_EDITOR
-
-            CachedGizmosInformation.PositionForModule = buffer.transform.position;
-            CachedGizmosInformation.ColorForModule = Color.magenta;
+            var selected = -1;
+            var position = _transform.position;
 
 #endif
 
-            // Get the slots attached to the found module.
-            var socket = _localServiceRepository.Fetch(buffer).GetLocalService<ModuleSocket>();
-            var slots = socket.Slots;
+            var origin = _transform.position;
+            var count = Physics2D.OverlapCircle(origin, _range, _filter, _buffer);
 
+            ModuleSocket socket = null;
             Slot slot = null;
-            cache = float.MaxValue;
-            count = slots.Count;
+            var nearest = float.MaxValue;
 
             for (var i = 0; i < count; i++)
             {
-                x = slots[i].transform.position.x;
-                y = slots[i].transform.position.y;
-                var position = new Vector2(x, y);
-                var distance = Vector2.Distance(origin, position);
+                var cache = _localServiceRepository.Fetch(_buffer[i]).GetLocalService<ModuleSocket>();
 
-                // Excludes slots beyond the search radius.
-                if (distance > _radius)
+                // Excludes this module and its own subtree.
+                if (cache == null || _moduleSocket.IsAncestorOf(cache))
                 {
                     continue;
                 }
+
+                var slots = cache.Slots;
+                var length = slots.Count;
+
+                for (var j = 0; j < length; j++)
+                {
+                    var distance = Vector2.Distance(origin, slots[j].transform.position);
+                    if (distance > _range)
+                    {
+                        continue;
+                    }
 
 #if UNITY_EDITOR
 
-                CachedGizmosInformation.PositionsForSlot.Add(position);
-                CachedGizmosInformation.ColorsForSlot.Add(slots[i].State == SlotState.Attachable ? Color.yellow : Color.red);
+                    CachedGizmosInformation.PositionsForSlot.Add(position);
+                    CachedGizmosInformation.ColorsForSlot.Add(slots[j].State == SlotState.Attachable ? Color.yellow : Color.red);
 
 #endif
 
-                // Excludes slots that cannot be connected.
-                if (slots[i].State == SlotState.Unattachable)
-                {
-                    continue;
-                }
+                    // Excludes slots that cannot be connected.
+                    if (slots[j].State == SlotState.Unattachable)
+                    {
+                        continue;
+                    }
 
-                if (distance < cache)
-                {
-                    slot = slots[i];
-                    cache = distance;
+                    if (distance >= nearest)
+                    {
+                        continue;
+                    }
+
+                    socket = cache;
+                    slot = slots[j];
+                    nearest = distance;
+
+#if UNITY_EDITOR
+
+                    selected = CachedGizmosInformation.PositionsForSlot.Count - 1;
+                    position = _buffer[i].transform.position;
+
+#endif
                 }
             }
 
-            // Returns null if no nearest slot is found.
+            // Returns null if no attachable slot is found.
             if (slot == null)
             {
                 return null;
@@ -159,24 +147,16 @@ namespace Core.Object.Module
 
 #if UNITY_EDITOR
 
-            count = CachedGizmosInformation.PositionsForSlot.Count;
-            for (var i = 0; i < count; i++)
-            {
-                if (CachedGizmosInformation.PositionsForSlot[i] != slot.transform.position)
-                {
-                    continue;
-                }
-
-                CachedGizmosInformation.PositionsForSlot[i] = slot.transform.position;
-                CachedGizmosInformation.ColorsForSlot[i] = Color.green;
-            }
+            CachedGizmosInformation.PositionForModule = position;
+            CachedGizmosInformation.ColorForModule = Color.magenta;
+            CachedGizmosInformation.ColorsForSlot[selected] = Color.green;
 
 #endif
 
             return new SearchedSlotResult(socket, slot);
         }
 
-        public float Radius => _radius;
+        public float Range => _range;
 
 #if UNITY_EDITOR
 

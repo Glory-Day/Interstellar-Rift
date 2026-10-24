@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Core.Utility;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using Sirenix.OdinInspector;
 using UnityEngine;

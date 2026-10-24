@@ -1,4 +1,5 @@
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 
 namespace Core.Object.Module.Structure
@@ -16,11 +17,17 @@ namespace Core.Object.Module.Structure
             return this;
         }
 
-        public override ModuleModel Build()
+        protected override void Validate()
+        {
+            if (_database == null)
+            {
+                throw new MissingBuildComponentException(typeof(CoreModuleModel), "Module Data Table");
+            }
+        }
+
+        protected override ModuleModel Create()
         {
             Console.LogProgress();
-
-            Console.LogSuccess($"{nameof(CoreModuleModel).ToNicifyPascalCase().ToBoldStyle()} is built.");
 
             return new CoreModuleModel(Rank, Data, _database);
         }

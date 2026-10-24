@@ -1,5 +1,5 @@
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,7 +16,7 @@ namespace Core.Object
 
             Console.LogSuccess($"{nameof(MouseButtonEventDispatcher).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
-            return new MouseButtonEventDispatcher(resolver);
+            return new MouseButtonEventDispatcher();
         }
 
         public override InstallationMode Mode => InstallationMode.Automatic;

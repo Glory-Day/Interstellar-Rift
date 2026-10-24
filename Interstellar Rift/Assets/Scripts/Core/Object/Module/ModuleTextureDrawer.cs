@@ -21,7 +21,7 @@ namespace Core.Object.Module
 
         public ModuleTextureDrawer(SpriteRenderer[] renderers,
                                    int textureID, int colorID,
-                                   ServiceResolver resolver) : base(resolver)
+                                   ColorApplicator colorApplicator)
         {
             Console.LogProgress();
 
@@ -30,7 +30,7 @@ namespace Core.Object.Module
             _textureID = textureID;
             _colorID = colorID;
 
-            _colorApplicator = resolver.GetLocalService<ColorApplicator>();
+            _colorApplicator = colorApplicator;
         }
 
         public override void Dispose()

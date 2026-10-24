@@ -1,4 +1,4 @@
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 
 namespace Core.Object.Module.Structure
@@ -10,11 +10,11 @@ namespace Core.Object.Module.Structure
             Console.LogProgress();
         }
 
-        public override ModuleModel Build()
+        protected override void Validate() { }
+
+        protected override ModuleModel Create()
         {
             Console.LogProgress();
-
-            Console.LogSuccess($"{nameof(ConnectionModuleModel).ToNicifyPascalCase().ToBoldStyle()} is built.");
 
             return new ConnectionModuleModel(Rank, Data);
         }

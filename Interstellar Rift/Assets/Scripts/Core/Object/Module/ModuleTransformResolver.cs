@@ -6,7 +6,7 @@ namespace Core.Object.Module
 {
     public class ModuleTransformResolver : LocalService
     {
-        public ModuleTransformResolver(Transform transform, ServiceResolver resolver) : base(resolver)
+        public ModuleTransformResolver(Transform transform)
         {
             Console.LogProgress();
 

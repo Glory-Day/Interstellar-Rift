@@ -1,3 +1,5 @@
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using Core.Utility.Input;
 using GloryDay.Debug;
 
@@ -18,7 +20,15 @@ namespace Core.Object.Module.Booster
             return this;
         }
 
-        public override ModuleModel Build()
+        protected override void Validate()
+        {
+            if (_inputActions == null)
+            {
+                throw new MissingBuildComponentException(typeof(BuiltInBoosterModuleModel), "Booster Module Input Actions");
+            }
+        }
+
+        protected override ModuleModel Create()
         {
             Console.LogProgress();
 

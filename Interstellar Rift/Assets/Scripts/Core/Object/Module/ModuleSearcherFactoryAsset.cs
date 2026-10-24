@@ -1,5 +1,5 @@
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,7 +14,7 @@ namespace Core.Object.Module
 
         [Title("Configuration")]
         [Tooltip("Radius for searching modules.")]
-        [SerializeField] private float radius;
+        [SerializeField] private float range;
         [Tooltip("The layer mask of modules to search for.")]
         [SerializeField] private LayerMask target;
 
@@ -24,11 +24,20 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
+            var localServiceRepository = resolver.GetGlobalService<LocalServiceRepository>();
+
+            var moduleSocket = resolver.GetLocalService<ModuleSocket>();
+
+            var transform = resolver.GetLocalService<ModuleTransformResolver>().Main;
+
             Console.LogSuccess($"{nameof(ModuleSearcher).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
-            return new ModuleSearcher(radius, target, resolver);
+            return new ModuleSearcher(range, target,
+                                      localServiceRepository,
+                                      moduleSocket,
+                                      transform);
         }
 
-        public override InstallationMode Mode => InstallationMode.Automatic;
+        public override InstallationMode Mode => InstallationMode.Lazy;
     }
 }

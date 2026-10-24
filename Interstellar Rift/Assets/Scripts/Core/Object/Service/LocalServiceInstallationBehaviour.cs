@@ -1,35 +1,44 @@
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
+using UnityEngine;
 
 namespace Core.Object.Service
 {
     /// <summary>
-    /// Serves as the base class for services that are available only on specific game objects.
+    /// The base class for installers of local services that depend on <see cref="MonoBehaviour"/>.
     /// </summary>
     public abstract class LocalServiceInstallationBehaviour : ServiceInstallationBehaviour, ILocalServiceInstallable
     {
+        /// <summary>
+        /// Installs local services that depend on <see cref="MonoBehaviour"/>.
+        /// </summary>
         public virtual void Install()
         {
             Console.LogSuccess($"{GetType().Name.ToNicifyPascalCase().ToBoldStyle()} is installed.");
         }
 
         /// <summary>
-        /// The <see cref="ServiceResolver"/> used to resolve local and global services for this instance.
+        /// Gets the resolver used to look up the services that the installed local services depend on.
         /// </summary>
+        /// <remarks>
+        /// The resolver is assigned by <see cref="Friend.Install"/> before <see cref="Install"/> is invoked.
+        /// </remarks>
         protected ServiceResolver Resolver { get; private set; }
+
+        public abstract InstallationMode Mode { get; }
 
         #region FRIEND CLASS API
 
         /// <summary>
-        /// Restricts write access to <see cref="Resolver"/> to trusted initializer classes that inherit from this type.
+        /// Grants classes that inherit this type the authority to install a <see cref="LocalServiceInstallationBehaviour"/>.
         /// </summary>
         public abstract class Friend
         {
             /// <summary>
-            /// Assigns the resolved <see cref="ServiceResolver"/> to a <see cref="LocalServiceInstallationBehaviour"/> instance.
+            /// Assigns the resolver to the specified installer and runs its installation.
             /// </summary>
-            /// <param name="installer">The service instance whose <see cref="Resolver"/> is being set.</param>
-            /// <param name="resolver">The resolver to assign.</param>
+            /// <param name="installer">The installer to run.</param>
+            /// <param name="resolver">The resolver used to look up the services that the installed local services depend on.</param>
             protected static void Install(LocalServiceInstallationBehaviour installer, ServiceResolver resolver)
             {
                 Console.LogProgress();

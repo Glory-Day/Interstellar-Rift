@@ -1,4 +1,3 @@
-using Core.Object.Service;
 using GloryDay.Debug;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,6 +12,7 @@ namespace Core.Object.Module
         #region SERIALIZABLE FIELD API
 
         [Title("Configuration")]
+        [ReadOnly]
         [Tooltip("The slot's current attachment state.")]
         [SerializeField] private SlotState state;
         [Tooltip("The direction of the slot attached to the module.")]
@@ -27,7 +27,6 @@ namespace Core.Object.Module
             Console.LogProgress();
 
             _socket = socket;
-            state = SlotState.Attachable;
         }
 
         public void Disconnect()
@@ -35,7 +34,6 @@ namespace Core.Object.Module
             Console.LogProgress();
 
             _socket = null;
-            state = SlotState.Unattachable;
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace Core.Object.Module
         /// <summary>
         /// The slot's current attachment state.
         /// </summary>
-        public SlotState State => state;
+        public SlotState State => _socket == null ? SlotState.Attachable : SlotState.Unattachable;
 
         /// <summary>
         /// The slot's fixed direction, as configured in the Inspector.

@@ -2,7 +2,7 @@
 
 using Core.Object.Module;
 using Core.Object.Module.Structure;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using Core.Utility.Pool;
 using Sirenix.OdinInspector;
 using UnityEngine;

@@ -8,8 +8,6 @@ namespace Core.Object.Module
     {
         protected Color Color;
 
-        protected ColorApplicator(ServiceResolver resolver) : base(resolver) { }
-
         public override void Dispose()
         {
             OnColorChanged = null;

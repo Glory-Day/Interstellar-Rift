@@ -31,7 +31,12 @@ namespace Core.Object.Module
             var installer = Resolver.GetLocalService<DynamicLocalServiceInstaller>();
             installer.Install(drawer);
 
+            var uninstaller = Resolver.GetLocalService<DynamicLocalServiceUninstaller>();
+            uninstaller.Uninstall<ModuleTextureDrawerBuilder>();
+
             base.Install();
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

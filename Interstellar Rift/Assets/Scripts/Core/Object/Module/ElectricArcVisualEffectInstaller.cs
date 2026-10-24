@@ -1,4 +1,3 @@
-using System;
 using Core.Object.Service;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -14,12 +13,14 @@ namespace Core.Object.Module
     {
         #region SERIALIZABLE FIELD API
 
+        [Title("Configuration")]
+        [SerializeField] private Color color;
+
         [Title("References")]
-        [Title("Positions", HorizontalLine = false)]
-        [SerializeField] private Transform a;
-        [SerializeField] private Transform b;
-        [SerializeField] private Transform c;
-        [SerializeField] private Transform d;
+        [SerializeField] private LineRenderer lineRenderer;
+
+        [Title("Object")]
+        [SerializeField] private GameObject[] sparkEffectObjects;
 
         #endregion
 
@@ -36,36 +37,28 @@ namespace Core.Object.Module
             _electricArcVisualEffect = null;
         }
 
-#if UNITY_EDITOR
-
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(a.position, 0.05f);
-            Gizmos.DrawWireSphere(b.position, 0.05f);
-            Gizmos.DrawWireSphere(c.position, 0.05f);
-            Gizmos.DrawWireSphere(d.position, 0.05f);
-
-            Gizmos.DrawLine(a.position, b.position);
-            Gizmos.DrawLine(b.position, c.position);
-            Gizmos.DrawLine(c.position, d.position);
-        }
-
-#endif
-
         public override void Install()
         {
             Console.LogProgress();
 
+            var material = lineRenderer.material;
+            material.SetColor(Shader.PropertyToID("_Color"), color);
+
             _electricArcVisualEffect = Resolver.GetLocalService<ElectricArcVisualEffectBuilder>()
-                                               .WithTransforms(a, b, c, d)
                                                .WithGameObject(gameObject)
+                                               .WithSparkEffectObjects(sparkEffectObjects)
+                                               .WithLineRenderer(lineRenderer)
                                                .Build();
 
             var installer = Resolver.GetLocalService<DynamicLocalServiceInstaller>();
             installer.Install(_electricArcVisualEffect);
 
+            var uninstaller = Resolver.GetLocalService<DynamicLocalServiceUninstaller>();
+            uninstaller.Uninstall<ElectricArcVisualEffectBuilder>();
+
             base.Install();
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

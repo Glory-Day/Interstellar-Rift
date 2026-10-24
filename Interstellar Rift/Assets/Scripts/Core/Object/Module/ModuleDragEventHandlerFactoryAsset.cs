@@ -1,5 +1,5 @@
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
@@ -13,9 +13,17 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
+            var moduleConnector = resolver.GetLocalService<ModuleConnector>();
+
+            var moduleDragMovement = resolver.GetLocalService<ModuleDragMovement>();
+
+            var mouseButtonEventDispatcher = resolver.GetLocalService<MouseButtonEventDispatcher>();
+
             Console.LogSuccess($"{nameof(ModuleDragEventHandler).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
-            return new ModuleDragEventHandler(resolver);
+            return new ModuleDragEventHandler(moduleConnector,
+                                              moduleDragMovement,
+                                              mouseButtonEventDispatcher);
         }
 
         public override InstallationMode Mode => InstallationMode.Lazy;

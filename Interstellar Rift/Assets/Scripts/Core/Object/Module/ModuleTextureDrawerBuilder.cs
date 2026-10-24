@@ -1,21 +1,42 @@
 using Core.Object.Service;
 using Core.Utility;
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
+using UnityEngine.Rendering.VirtualTexturing;
 
 namespace Core.Object.Module
 {
-    public class ModuleTextureDrawerBuilder : LocalService, IBuildable<ModuleTextureDrawer>
+    public class ModuleTextureDrawerBuilder : LocalServiceBuilder<ModuleTextureDrawer>
     {
+        #region LOCAL SERVICE API
+
+        private ColorApplicator _colorApplicator;
+
+        #endregion
+
         private SpriteRenderer[] _renderers;
 
-        private int _textureID;
-        private int _colorID;
+        private int? _textureID;
+        private int? _colorID;
 
-        public ModuleTextureDrawerBuilder(ServiceResolver resolver) : base(resolver)
+        public ModuleTextureDrawerBuilder(ColorApplicator colorApplicator)
         {
             Console.LogProgress();
+
+            _colorApplicator = colorApplicator;
+        }
+
+        public override void Dispose()
+        {
+            Console.LogProgress();
+
+            base.Dispose();
+
+            _colorApplicator = null;
+
+            _renderers = null;
         }
 
         public ModuleTextureDrawerBuilder WithSpriteRenderers(SpriteRenderer[] renderers)
@@ -33,20 +54,28 @@ namespace Core.Object.Module
             return this;
         }
 
-        public override void Dispose()
+        protected override void Validate()
         {
-            Console.LogProgress();
+            if (_renderers == null)
+            {
+                throw new MissingBuildComponentException(typeof(ModuleTextureDrawer), "Sprite Renderers");
+            }
 
-            _renderers = null;
+            if (_textureID == null || _colorID == null)
+            {
+                throw new MissingBuildComponentException(typeof(ModuleTextureDrawer), "Shader IDs");
+            }
         }
 
-        public ModuleTextureDrawer Build()
+        protected override ModuleTextureDrawer Create()
         {
             Console.LogProgress();
 
-            Console.LogSuccess($"{nameof(ModuleTextureDrawer).ToNicifyPascalCase().ToBoldStyle()} is built.");
+            var textureID = _textureID ?? 0;
+            var colorID = _colorID ?? 0;
+            var result = new ModuleTextureDrawer(_renderers, textureID, colorID, _colorApplicator);
 
-            return new ModuleTextureDrawer(_renderers, _textureID, _colorID, Resolver);
+            return result;
         }
     }
 }

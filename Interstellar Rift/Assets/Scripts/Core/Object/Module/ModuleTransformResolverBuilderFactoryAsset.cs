@@ -1,5 +1,5 @@
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
@@ -15,7 +15,7 @@ namespace Core.Object.Module
 
             Console.LogSuccess($"{nameof(ModuleTransformResolverBuilder).ToNicifyPascalCase().ToBoldStyle()} is built.");
 
-            return new ModuleTransformResolverBuilder(resolver);
+            return new ModuleTransformResolverBuilder();
         }
 
         public override InstallationMode Mode => InstallationMode.Manual;

@@ -1,15 +1,17 @@
+using System;
 using System.Collections.Generic;
 using Core.Utility;
-using Core.Utility.Extension;
-using GloryDay.Debug;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Service
 {
-    public class LocalServiceRegistryBuilder : IBuildable<LocalServiceRegistry>
+    public class LocalServiceRegistryBuilder : Builder<LocalServiceRegistry>
     {
         private readonly LocalServiceInstallationQueue _queue;
 
-        private List<LocalService> _container;
+        private Dictionary<Type, LocalService> _container;
         private ServiceResolver _resolver;
 
         public LocalServiceRegistryBuilder(List<LocalServiceFactoryAsset> assets)
@@ -19,7 +21,7 @@ namespace Core.Object.Service
             _queue = new LocalServiceInstallationQueue(assets);
         }
 
-        public LocalServiceRegistryBuilder WithLocalServiceContainer(List<LocalService> container)
+        public LocalServiceRegistryBuilder WithLocalServiceContainer(Dictionary<Type, LocalService> container)
         {
             _container = container;
 
@@ -33,11 +35,22 @@ namespace Core.Object.Service
             return this;
         }
 
-        public LocalServiceRegistry Build()
+        protected override void Validate()
+        {
+            if (_container == null)
+            {
+                throw new MissingBuildComponentException(typeof(LocalServiceRegistry), "Local Service Container");
+            }
+
+            if (_resolver == null)
+            {
+                throw new MissingBuildComponentException(typeof(LocalServiceRegistry), "Service Resolver");
+            }
+        }
+
+        protected override LocalServiceRegistry Create()
         {
             Console.LogProgress();
-
-            Console.LogSuccess($"{nameof(LocalServiceRegistry).ToNicifyPascalCase().ToBoldStyle()} is built.");
 
             return new LocalServiceRegistry(_queue, _container, _resolver);
         }

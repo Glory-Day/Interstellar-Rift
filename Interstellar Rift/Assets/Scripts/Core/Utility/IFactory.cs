@@ -1,7 +1,7 @@
 namespace Core.Utility
 {
     /// <summary>
-    /// Represents a factory that creates instances of <typeparamref name="T"/>.
+    /// Define a method that creates and returns an instance of <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type of instance this factory creates.</typeparam>
     public interface IFactory<out T>

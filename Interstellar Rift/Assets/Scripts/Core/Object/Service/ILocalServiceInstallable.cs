@@ -1,13 +1,15 @@
 namespace Core.Object.Service
 {
     /// <summary>
-    /// Represents an object that requires initialization before it can be used.
+    /// Defines a method for installing local services that depend on external APIs, such as the Unity API.
     /// </summary>
     public interface ILocalServiceInstallable
     {
         /// <summary>
-        /// Initializes this object so it can begin using the local services it depends on.
+        /// Installs local services that depend on external APIs.
         /// </summary>
         public void Install();
+
+        public InstallationMode Mode { get; }
     }
 }

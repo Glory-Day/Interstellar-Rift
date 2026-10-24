@@ -1,20 +1,32 @@
+using System;
 using System.Collections.Generic;
-using Core.Utility.Exception;
-using Core.Utility.Extension;
-using GloryDay.Debug;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using VContainer;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Service
 {
     /// <summary>
-    /// Resolves registered local services from a serialized list and global services registered with DI via VContainer.
+    /// Resolves the local services installed in a single module and the global services
+    /// registered with VContainer, and supplies them to the client objects that depend on them.
     /// </summary>
+    /// <remarks>
+    /// Each module has its own <see cref="ServiceResolver"/>. Local services are resolved only
+    /// from those installed in the module that owns this resolver, whereas global services are
+    /// resolved from VContainer.
+    /// </remarks>
     public class ServiceResolver : IGlobalServiceResolver, ILocalServiceResolver
     {
-        private readonly IReadOnlyList<LocalService> _services;
+        private readonly IReadOnlyDictionary<Type, LocalService> _services;
         private readonly IObjectResolver _resolver;
 
-        public ServiceResolver(IObjectResolver resolver, IReadOnlyList<LocalService> services)
+        /// <param name="resolver">The VContainer resolver from which global services are resolved.</param>
+        /// <param name="services">
+        /// The local services installed in the module that owns this resolver,
+        /// keyed by the type under which each service is installed.
+        /// </param>
+        public ServiceResolver(IObjectResolver resolver, IReadOnlyDictionary<Type, LocalService> services)
         {
             Console.LogProgress();
 
@@ -22,32 +34,28 @@ namespace Core.Object.Service
             _services = services;
         }
 
-        /// <summary>
-        /// Linearly searches the serialized local service list for the first entry assignable to <typeparamref name="TService"/>.
-        /// </summary>
-        /// <typeparam name="TService">The local service type to find, derived from <see cref="LocalService"/>.</typeparam>
-        /// <returns>The matching service instance, or <c>null</c> if none is found.</returns>
+        /// <inheritdoc/>
+        /// <remarks>
+        /// The local service is looked up by its exact installed type.
+        /// A local service installed under a type derived from <typeparamref name="TService"/> is not matched.
+        /// </remarks>
+        /// <exception cref="MissingRequiredLocalServiceException">
+        /// Thrown when no local service is installed under <typeparamref name="TService"/> in the module.
+        /// </exception>
         public TService GetLocalService<TService>() where TService : LocalService
         {
-            Console.LogProgress();
-
-            var count = _services.Count;
-            for (var i = 0; i < count; i++)
+            if (_services.TryGetValue(typeof(TService), out var service) == false)
             {
-                if (_services[i] is TService)
-                {
-                    return (TService)_services[i];
-                }
+                throw new MissingRequiredLocalServiceException(typeof(TService).Name.ToNicifyPascalCase());
             }
 
-            throw new MissingRequiredLocalServiceException(typeof(TService).Name.ToNicifyPascalCase());
+            return (TService)service;
         }
 
-        /// <summary>
-        /// Resolves a global service of type <typeparamref name="TService"/> from the injected VContainer <see cref="IObjectResolver"/>.
-        /// </summary>
-        /// <typeparam name="TService">The registered service type to resolve.</typeparam>
-        /// <returns>The resolved service instance.</returns>
+        /// <inheritdoc/>
+        /// <exception cref="VContainerException">
+        /// Thrown when no global service of type <typeparamref name="TService"/> is registered with VContainer.
+        /// </exception>
         public TService GetGlobalService<TService>()
         {
             Console.LogProgress();

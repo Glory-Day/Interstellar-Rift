@@ -7,7 +7,7 @@ namespace Core.Object
 {
     public class UpdateEventDispatcher : GlobalService, IUpdateEventDispatcher
     {
-        public UpdateEventDispatcher(IObjectResolver resolver) : base(resolver)
+        public UpdateEventDispatcher()
         {
             Console.LogProgress();
         }

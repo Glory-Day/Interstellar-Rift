@@ -1,4 +1,5 @@
 using Core.Object.Service;
+using Cysharp.Threading.Tasks;
 using UnityEngine.EventSystems;
 
 using Console = GloryDay.Debug.Console;
@@ -12,57 +13,64 @@ namespace Core.Object.Module
     {
         #region LOCAL SERVICE API
 
-        private ModuleSocket _moduleSocket;
-        private ModuleSearcher _moduleSearcher;
+        private ModuleConnector _moduleConnector;
+
         private ModuleDragMovement _moduleDragMovement;
-        private ModuleDragVisualEffect _moduleDragVisualEffect;
+
         private MouseButtonEventDispatcher _mouseButtonEventDispatcher;
 
         #endregion
 
-        public ModuleDragEventHandler(ServiceResolver resolver) : base(resolver)
+        public ModuleDragEventHandler(ModuleConnector moduleConnector,
+                                      ModuleDragMovement moduleDragMovement,
+                                      MouseButtonEventDispatcher mouseButtonEventDispatcher)
         {
             Console.LogProgress();
 
-            _moduleSocket = Resolver.GetLocalService<ModuleSocket>();
-            _moduleSearcher = Resolver.GetLocalService<ModuleSearcher>();
-            _moduleDragMovement = Resolver.GetLocalService<ModuleDragMovement>();
-            _moduleDragVisualEffect = Resolver.GetLocalService<ModuleDragVisualEffect>();
+            _moduleConnector = moduleConnector;
 
-            _mouseButtonEventDispatcher = Resolver.GetLocalService<MouseButtonEventDispatcher>();
-            _mouseButtonEventDispatcher.OnMouseButtonPressed += BeginMoving;
-            _mouseButtonEventDispatcher.OnMouseButtonPressed += Search;
+            _moduleDragMovement = moduleDragMovement;
+
+            _mouseButtonEventDispatcher = mouseButtonEventDispatcher;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed += Disconnect;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed += StartMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed += StartSearching;
             _mouseButtonEventDispatcher.OnMouseButtonDragged += Move;
-            _mouseButtonEventDispatcher.OnMouseButtonDragged += Search;
-            _mouseButtonEventDispatcher.OnMouseButtonReleased += EndMoving;
-            _mouseButtonEventDispatcher.OnMouseButtonReleased += EndVisualEffect;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased += StopMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased += StopSearching;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased += TryConnection;
         }
 
         public override void Dispose()
         {
             Console.LogProgress();
 
-            _mouseButtonEventDispatcher.OnMouseButtonPressed -= BeginMoving;
-            _mouseButtonEventDispatcher.OnMouseButtonPressed -= Search;
-            _mouseButtonEventDispatcher.OnMouseButtonDragged -= Move;
-            _mouseButtonEventDispatcher.OnMouseButtonDragged -= Search;
-            _mouseButtonEventDispatcher.OnMouseButtonReleased -= EndMoving;
-            _mouseButtonEventDispatcher.OnMouseButtonReleased -= EndVisualEffect;
+            _moduleConnector = null;
 
-            _moduleSocket = null;
-            _moduleSearcher = null;
             _moduleDragMovement = null;
-            _moduleDragVisualEffect = null;
+
+            _mouseButtonEventDispatcher.OnMouseButtonPressed -= Disconnect;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed -= StartMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonPressed -= StartSearching;
+            _mouseButtonEventDispatcher.OnMouseButtonDragged -= Move;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased -= StopMoving;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased -= StopSearching;
+            _mouseButtonEventDispatcher.OnMouseButtonReleased -= TryConnection;
             _mouseButtonEventDispatcher = null;
         }
 
         /// <summary>
-        /// Forwards the pointer's screen position to <see cref="ModuleDragMovement.BeginMoving"/> to start dragging.
+        /// Forwards the pointer's screen position to <see cref="ModuleDragMovement.StartMoving"/> to start dragging.
         /// </summary>
         /// <param name="eventData">The pointer event data from the mouse press.</param>
-        private void BeginMoving(PointerEventData eventData)
+        private void StartMoving(PointerEventData eventData)
         {
-            _moduleDragMovement.BeginMoving(eventData.position);
+            if (_moduleConnector.IsConnecting)
+            {
+                return;
+            }
+
+            _moduleDragMovement.StartMoving(eventData.position);
         }
 
         /// <summary>
@@ -71,59 +79,41 @@ namespace Core.Object.Module
         /// <param name="eventData">The pointer event data from the mouse drag.</param>
         private void Move(PointerEventData eventData)
         {
+            if (_moduleConnector.IsConnecting)
+            {
+                return;
+            }
+
             _moduleDragMovement.Move(eventData.position);
         }
 
         /// <summary>
-        /// Stops dragging via <see cref="ModuleDragMovement.EndMoving"/>.
+        /// Stops dragging via <see cref="ModuleDragMovement.StopMoving"/>.
         /// </summary>
         /// <param name="eventData">The pointer event data from the mouse release.</param>
-        private void EndMoving(PointerEventData eventData)
+        private void StopMoving(PointerEventData eventData)
         {
-            _moduleDragMovement.EndMoving();
+            _moduleDragMovement.StopMoving();
         }
 
-        /// <summary>
-        /// Searches for the nearest attachable slot and, if one is found, starts or updates the arc visual effect
-        /// toward it and rotates the module to face it; otherwise stops the visual effect if it is running.
-        /// </summary>
-        /// <param name="eventData">The pointer event data from the mouse press or drag.</param>
-        private void Search(PointerEventData eventData)
+        private void StartSearching(PointerEventData eventData)
         {
-            var result = _moduleSearcher.Search();
-            var spawner = _moduleSocket.Joint.transform.position;
-
-            if (result.HasValue)
-            {
-                if (_moduleDragVisualEffect.IsUpdating == false)
-                {
-                    _moduleDragVisualEffect.StartVisualEffect(spawner, result.Value);
-                }
-            }
-            else
-            {
-                if (_moduleDragVisualEffect.IsUpdating)
-                {
-                    _moduleDragVisualEffect.StopVisualEffect();
-                }
-
-                return;
-            }
-
-            var slot = result.Value.Slot;
-            var target = slot.transform.position;
-
-            _moduleDragVisualEffect.UpdateVisualEffect(spawner, result.Value);
-            _moduleDragMovement.Rotate(target);
+            _moduleConnector.StartSearching();
         }
 
-        /// <summary>
-        /// Stops the arc visual effect via <see cref="ModuleDragVisualEffect.StopVisualEffect"/>.
-        /// </summary>
-        /// <param name="eventData">The pointer event data from the mouse release.</param>
-        private void EndVisualEffect(PointerEventData eventData)
+        private void StopSearching(PointerEventData eventData)
         {
-            _moduleDragVisualEffect.StopVisualEffect();
+            _moduleConnector.StopSearching();
+        }
+
+        private void TryConnection(PointerEventData eventData)
+        {
+            _moduleConnector.TryConnect().Forget();
+        }
+
+        private void Disconnect(PointerEventData eventData)
+        {
+            _moduleConnector.Disconnect();
         }
     }
 }

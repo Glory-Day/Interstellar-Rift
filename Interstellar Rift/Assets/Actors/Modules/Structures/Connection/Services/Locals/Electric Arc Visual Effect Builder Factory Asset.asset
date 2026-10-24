@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40e9a5eb2b3c45e4b9e40ee1480d0f2e, type: 3}
   m_Name: Electric Arc Visual Effect Builder Factory Asset
   m_EditorClassIdentifier: 
-  amount: 0.3
+  amplitude: 0.3
   speed: 2
   range: 0.05
+  seed: 37.13
+  axis: 91.7

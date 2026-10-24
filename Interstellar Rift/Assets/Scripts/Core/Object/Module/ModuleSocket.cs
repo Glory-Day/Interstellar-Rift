@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Core.Object.Service;
 using GloryDay.Debug;
+using UnityEngine;
 
 namespace Core.Object.Module
 {
@@ -9,12 +10,21 @@ namespace Core.Object.Module
     /// </summary>
     public class ModuleSocket : LocalService, INode
     {
-        public ModuleSocket(List<Slot> slots, Slot joint, ServiceResolver resolver) : base(resolver)
+        #region LOCAL SERVICE API
+
+        private Transform _transform;
+
+        #endregion
+
+        public ModuleSocket(List<Slot> slots, Slot joint,
+                            Transform transform)
         {
             Console.LogProgress();
 
             Slots = slots;
             Joint = joint;
+
+            _transform = transform;
         }
 
         public override void Dispose()
@@ -23,6 +33,8 @@ namespace Core.Object.Module
 
             Slots = null;
             Joint = null;
+
+            _transform = null;
         }
 
         /// <summary>
@@ -43,27 +55,64 @@ namespace Core.Object.Module
                 }
 
                 Slots[i].Connect(socket);
+                socket.Attach(Slots[i]);
             }
         }
 
-        /// <summary>
-        /// Detaches the module from the slot at the given direction.
-        /// </summary>
-        /// <param name="direction">The direction of the slot configured on the module.</param>
-        public void Disconnect(Direction direction)
+        private void Attach(Slot slot)
+        {
+            Console.LogProgress();
+
+            _transform.SetParent(slot.transform, true);
+        }
+
+        public bool Disconnect()
+        {
+            Console.LogProgress();
+
+            if (IsRootNode || Joint.Socket == null)
+            {
+                return false;
+            }
+
+            Joint.Socket.Disconnect(this);
+
+            return true;
+        }
+
+        private void Disconnect(ModuleSocket socket)
         {
             Console.LogProgress();
 
             var count = Slots.Count;
             for (var i = 0; i < count; i++)
             {
-                if (Slots[i].Direction != direction)
+                var slot = Slots[i];
+                if (slot.Socket != socket)
                 {
                     continue;
                 }
 
-                Slots[i].Disconnect();
+                var child = slot.Socket;
+                if (child == null)
+                {
+                    return;
+                }
+
+                slot.Disconnect();
+
+                child.Joint.Disconnect();
+                child.Detach();
+
+                return;
             }
+        }
+
+        private void Detach()
+        {
+            Console.LogProgress();
+
+            _transform.SetParent(null, true);
         }
 
         /// <inheritdoc/>
@@ -93,7 +142,7 @@ namespace Core.Object.Module
             {
                 if (Slots[i].Direction == direction)
                 {
-                    return true;
+                    return Slots[i].Socket != null;
                 }
             }
 
@@ -110,8 +159,21 @@ namespace Core.Object.Module
             return child != null;
         }
 
+        public bool IsAncestorOf(ModuleSocket socket)
+        {
+            for (INode node = socket; node != null; node = node.ParentNode)
+            {
+                if (ReferenceEquals(node, this))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <inheritdoc/>
-        public INode ParentNode => Joint.Socket;
+        public INode ParentNode => IsRootNode ? null : Joint.Socket;
 
         /// <inheritdoc/>
         public bool IsRootNode => Joint == null;

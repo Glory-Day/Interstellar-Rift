@@ -1,54 +1,47 @@
 using Core.Object.Service;
 using Core.Utility;
-using Core.Utility.Exception;
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
 namespace Core.Object.Module
 {
-    public class ElectricArcVisualEffectBuilder : LocalService, IBuildable<ElectricArcVisualEffect>
+    public class ElectricArcVisualEffectBuilder : LocalServiceBuilder<ElectricArcVisualEffect>
     {
-        private const int Minimum = 1;
-        private const int Maximum = 10000;
+        #region LOCAL SERVICE API
 
-        private Transform[] _transforms;
+        private ModuleConnectionPathCacher _moduleConnectionPathCacher;
 
-        private readonly float _amount;
-
-        private readonly float _speed;
-        private readonly float _range;
-
-        private readonly float _seed;
+        #endregion
 
         private GameObject _gameObject;
+        private GameObject[] _sparkEffectObjects;
+        private LineRenderer _lineRenderer;
 
-        public ElectricArcVisualEffectBuilder(float amount,
-                                              float speed, float range,
-                                              ServiceResolver resolver) : base(resolver)
+        private readonly int _segments;
+
+        public ElectricArcVisualEffectBuilder(int segments,
+                                              ModuleConnectionPathCacher moduleConnectionPathCacher)
         {
             Console.LogProgress();
 
-            _amount = amount;
+            _segments = segments;
 
-            _speed = speed;
-            _range = range;
-
-            _seed = new System.Random().Next(Minimum, Maximum);
+            _moduleConnectionPathCacher = moduleConnectionPathCacher;
         }
 
         public override void Dispose()
         {
             Console.LogProgress();
 
-            _transforms = null;
-        }
+            base.Dispose();
 
-        public ElectricArcVisualEffectBuilder WithTransforms(Transform a, Transform b, Transform c, Transform d)
-        {
-            _transforms = new[] { a, b, c, d };
+            _gameObject = null;
+            _sparkEffectObjects = null;
+            _lineRenderer = null;
 
-            return this;
+            _moduleConnectionPathCacher = null;
         }
 
         public ElectricArcVisualEffectBuilder WithGameObject(GameObject gameObject)
@@ -58,23 +51,45 @@ namespace Core.Object.Module
             return this;
         }
 
-        public ElectricArcVisualEffect Build()
+        public ElectricArcVisualEffectBuilder WithLineRenderer(LineRenderer lineRenderer)
+        {
+            _lineRenderer = lineRenderer;
+
+            return this;
+        }
+
+        public ElectricArcVisualEffectBuilder WithSparkEffectObjects(GameObject[] sparkEffectObjects)
+        {
+            _sparkEffectObjects = sparkEffectObjects;
+
+            return this;
+        }
+
+        protected override void Validate()
+        {
+            if (_gameObject == null)
+            {
+                throw new MissingBuildComponentException(typeof(ElectricArcVisualEffect), "GameObject");
+            }
+
+            if (_sparkEffectObjects == null)
+            {
+                throw new MissingBuildComponentException(typeof(ElectricArcVisualEffect), "GameObjects");
+            }
+
+            if (_lineRenderer == null)
+            {
+                throw new MissingBuildComponentException(typeof(ElectricArcVisualEffect), "LineRenderer");
+            }
+        }
+
+        protected override ElectricArcVisualEffect Create()
         {
             Console.LogProgress();
 
-            if (_transforms == null)
-            {
-                throw new MissingRequiredComponentException(GetType(), nameof(Transform));
-            }
-
-            if (_gameObject == null)
-            {
-                throw new MissingRequiredComponentException(GetType(), nameof(GameObject));
-            }
-
-            Console.LogSuccess($"{nameof(ElectricArcVisualEffect).ToNicifyPascalCase().ToBoldStyle()} is built.");
-
-            return new ElectricArcVisualEffect(_transforms, _amount, _speed, _range, _seed, _gameObject, Resolver);
+            return new ElectricArcVisualEffect(_gameObject, _sparkEffectObjects, _lineRenderer,
+                                               _segments,
+                                               _moduleConnectionPathCacher);
         }
     }
 }

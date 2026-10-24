@@ -1,6 +1,8 @@
+using Core.Utility;
+
 namespace Core.Object.Module
 {
-    public abstract class ModuleModelBuilder : IModuleModelBuildable
+    public abstract class ModuleModelBuilder : Builder<ModuleModel>
     {
         protected readonly ModuleRank Rank;
         protected readonly ModuleData Data;
@@ -10,7 +12,5 @@ namespace Core.Object.Module
             Rank = rank;
             Data = data;
         }
-
-        public abstract ModuleModel Build();
     }
 }

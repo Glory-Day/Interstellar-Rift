@@ -1,11 +1,9 @@
-using Core.Utility.Extension;
-using GloryDay.Debug;
 using UnityEngine;
 
 namespace Core.Object.Service
 {
-    public class ServiceInstallationBehaviour : MonoBehaviour
-    {
-
-    }
+    /// <summary>
+    /// An installer that installs services that depend on <see cref="MonoBehaviour"/>.
+    /// </summary>
+    public class ServiceInstallationBehaviour : MonoBehaviour { }
 }

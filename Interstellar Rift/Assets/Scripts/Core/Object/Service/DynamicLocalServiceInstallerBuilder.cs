@@ -1,15 +1,17 @@
+using System;
 using System.Collections.Generic;
 using Core.Utility;
-using Core.Utility.Extension;
-using GloryDay.Debug;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Service
 {
-    public class DynamicLocalServiceInstallerBuilder : LocalService, IBuildable<DynamicLocalServiceInstaller>
+    public class DynamicLocalServiceInstallerBuilder : LocalServiceBuilder<DynamicLocalServiceInstaller>
     {
-        private List<LocalService> _services;
+        private Dictionary<Type, LocalService> _services;
 
-        public DynamicLocalServiceInstallerBuilder(ServiceResolver resolver) : base(resolver)
+        public DynamicLocalServiceInstallerBuilder()
         {
             Console.LogProgress();
         }
@@ -18,23 +20,31 @@ namespace Core.Object.Service
         {
             Console.LogProgress();
 
+            base.Dispose();
+
             _services = null;
         }
 
-        public DynamicLocalServiceInstallerBuilder WithLocalServices(List<LocalService> services)
+        public DynamicLocalServiceInstallerBuilder WithLocalServices(Dictionary<Type, LocalService> services)
         {
             _services = services;
 
             return this;
         }
 
-        public DynamicLocalServiceInstaller Build()
+        protected override void Validate()
+        {
+            if (_services == null)
+            {
+                throw new MissingBuildComponentException(typeof(DynamicLocalServiceInstaller), "Local Service Container");
+            }
+        }
+
+        protected override DynamicLocalServiceInstaller Create()
         {
             Console.LogProgress();
 
-            Console.LogSuccess($"{nameof(DynamicLocalServiceInstaller).ToNicifyPascalCase().ToBoldStyle()} is built.");
-
-            return new DynamicLocalServiceInstaller(_services, Resolver);
+            return new DynamicLocalServiceInstaller(_services);
         }
     }
 }

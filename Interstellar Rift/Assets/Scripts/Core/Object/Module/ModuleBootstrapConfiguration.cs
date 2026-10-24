@@ -7,8 +7,8 @@ namespace Core.Object.Module
     public readonly struct ModuleBootstrapConfiguration
     {
         public ModuleBootstrapConfiguration(IObjectResolver resolver,
-                                      GameObject clone,
-                                      ModuleSpawnSpecification specification)
+                                            GameObject clone,
+                                            ModuleSpawnSpecification specification)
         {
             ObjectResolver = resolver;
 

@@ -1,7 +1,7 @@
 namespace Core.Object.Service
 {
-    public abstract class LocalServiceBuilderFactoryAsset : LocalServiceFactoryAsset
-    {
-
-    }
+    /// <summary>
+    /// Serves as the base class for the factory assets that create local service builders.
+    /// </summary>
+    public abstract class LocalServiceBuilderFactoryAsset : LocalServiceFactoryAsset { }
 }

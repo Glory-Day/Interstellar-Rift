@@ -1,5 +1,5 @@
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
@@ -13,9 +13,11 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
+            var colorApplicator = resolver.GetLocalService<ColorApplicator>();
+
             Console.LogSuccess($"{nameof(ModuleTextureDrawerBuilder).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
-            return new ModuleTextureDrawerBuilder(resolver);
+            return new ModuleTextureDrawerBuilder(colorApplicator);
         }
 
         public override InstallationMode Mode => InstallationMode.Automatic;

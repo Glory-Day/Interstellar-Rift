@@ -1,15 +1,17 @@
 using Core.Object.Service;
 using Core.Utility;
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
+using UnityEngine.SocialPlatforms;
 
 namespace Core.Object.Module
 {
-    public class ModuleModelResolverBuilder : LocalService, IBuildable<ModuleModelResolver>
+    public class ModuleModelResolverBuilder : LocalServiceBuilder<ModuleModelResolver>
     {
         private ModuleModel _model;
 
-        public ModuleModelResolverBuilder(ServiceResolver resolver) : base(resolver)
+        public ModuleModelResolverBuilder()
         {
             Console.LogProgress();
         }
@@ -17,6 +19,8 @@ namespace Core.Object.Module
         public override void Dispose()
         {
             Console.LogProgress();
+
+            base.Dispose();
 
             _model = null;
         }
@@ -28,13 +32,19 @@ namespace Core.Object.Module
             return this;
         }
 
-        public ModuleModelResolver Build()
+        protected override void Validate()
+        {
+            if (_model == null)
+            {
+                throw new MissingBuildComponentException(typeof(ModuleModelResolver), "Module Model");
+            }
+        }
+
+        protected override ModuleModelResolver Create()
         {
             Console.LogProgress();
 
-            Console.LogSuccess($"{nameof(ModuleModelResolver).ToNicifyPascalCase().ToBoldStyle()} is built.");
-
-            return new ModuleModelResolver(_model, Resolver);
+            return new ModuleModelResolver(_model);
         }
     }
 }

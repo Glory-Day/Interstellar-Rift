@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Core.Object.Module;
 using Core.Object.Module.Structure;
 using Core.Utility;
-using Core.Utility.Extension;
-using GloryDay.Debug;
+using Core.Utility.Extensions;
+
+using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Service
 {
@@ -12,7 +14,7 @@ namespace Core.Object.Service
         private readonly LocalServiceInstallationRunner _runner;
         private readonly ModuleBootstrapConfiguration _configuration;
 
-        private List<LocalService> _container;
+        private Dictionary<Type, LocalService> _container;
         private ServiceResolver _resolver;
 
         public ServiceResolverFactory(LocalServiceInstallationRunner runner,
@@ -28,7 +30,7 @@ namespace Core.Object.Service
         {
             Console.LogProgress();
 
-            _container = new List<LocalService>();
+            _container = new Dictionary<Type, LocalService>();
             _resolver = new ServiceResolverBuilder().WithGlobalServices(_configuration.ObjectResolver)
                                                     .WithLocalServiceContainer(_container)
                                                     .Build();
@@ -39,15 +41,20 @@ namespace Core.Object.Service
                                   .WithServiceResolver(_resolver)
                                   .Build();
 
+            _runner.Import();
+
             registry.TryRegisterByType<DynamicLocalServiceInstallerBuilderFactoryAsset>(CreateDynamicLocalServiceInstaller);
+            registry.TryRegisterByType<DynamicLocalServiceUninstallerBuilderFactoryAsset>(CreateDynamicLocalServiceUninstaller);
             registry.TryRegisterByType<ModuleTransformResolverBuilderFactoryAsset>(CreateModuleTransformResolver);
             registry.TryRegisterByType<ModuleModelResolverBuilderFactoryAsset>(CreateModuleModelResolver);
 
-            registry.RegisterAllAsAutomatically();
+            registry.RegisterAllAsAutomatic();
 
-            _runner.Install(_resolver);
+            _runner.Install(_resolver, InstallationMode.Automatic);
 
             registry.RegisterAllAsLazy();
+
+            _runner.Install(_resolver, InstallationMode.Lazy);
 
             Console.LogSuccess($"{nameof(ServiceResolver).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
@@ -58,6 +65,15 @@ namespace Core.Object.Service
         {
             var builder = factory.Create(_resolver) as DynamicLocalServiceInstallerBuilder;
             var service = builder?.WithLocalServices(_container)
+                                  .Build();
+
+            return service;
+        }
+
+        private LocalService CreateDynamicLocalServiceUninstaller(DynamicLocalServiceUninstallerBuilderFactoryAsset factory)
+        {
+            var builder = factory.Create(_resolver) as DynamicLocalServiceUninstallerBuilder;
+            var service = builder?.WithLocalServiceContainer(_container)
                                   .Build();
 
             return service;

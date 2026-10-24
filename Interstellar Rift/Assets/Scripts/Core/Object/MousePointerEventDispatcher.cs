@@ -8,7 +8,7 @@ namespace Core.Object
 {
     public class MousePointerEventDispatcher : LocalService, IMousePointerEventDispatcher
     {
-        public MousePointerEventDispatcher(ServiceResolver resolver) : base(resolver)
+        public MousePointerEventDispatcher()
         {
             Console.LogProgress();
         }

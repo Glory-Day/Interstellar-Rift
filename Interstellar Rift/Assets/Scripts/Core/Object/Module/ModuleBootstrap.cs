@@ -1,6 +1,6 @@
 using Core.Object.Service;
-using Core.Utility.Exception;
-using Core.Utility.Extension;
+using Core.Utility.Exceptions;
+using Core.Utility.Extensions;
 using UnityEngine;
 
 using Console = GloryDay.Debug.Console;

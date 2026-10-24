@@ -1,6 +1,6 @@
 using System;
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using UnityEngine;
 using VContainer;
 using Console = GloryDay.Debug.Console;
@@ -15,7 +15,7 @@ namespace Core.Object
         {
             Console.LogProgress();
 
-            builder.Register(resolver => new UpdateEventDispatcher(resolver), Lifetime.Scoped)
+            builder.RegisterInstance(new UpdateEventDispatcher())
                    .As<IUpdateEventDispatcher>()
                    .AsSelf();
 

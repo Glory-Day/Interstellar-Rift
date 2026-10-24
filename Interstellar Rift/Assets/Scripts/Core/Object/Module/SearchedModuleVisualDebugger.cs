@@ -8,7 +8,7 @@ using Console = GloryDay.Debug.Console;
 
 namespace Core.Object.Module
 {
-    public class SearchedModuleVisualDebugger : LocalServiceInstallationBehaviour
+    public class SearchedModuleVisualDebugger : LocalServiceInstalledVisualDebugger
     {
         #region LOCAL SERVICE API
 
@@ -34,14 +34,14 @@ namespace Core.Object.Module
 
 #if UNITY_EDITOR
 
-        private void OnDrawGizmosSelected()
+        protected override void DrawGizmos()
         {
             if (_moduleSearcher == null)
             {
                 return;
             }
 
-            var radius = _moduleSearcher.Radius;
+            var radius = _moduleSearcher.Range;
             var cachedGizmosInformation = _moduleSearcher.CachedGizmosInformation;
 
             // Draws the search radius boundary.
@@ -92,6 +92,8 @@ namespace Core.Object.Module
         }
 
 #endif
+
+        public override InstallationMode Mode => InstallationMode.Lazy;
     }
 }
 

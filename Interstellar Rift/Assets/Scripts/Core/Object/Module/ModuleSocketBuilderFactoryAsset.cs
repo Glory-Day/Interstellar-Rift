@@ -1,5 +1,5 @@
 using Core.Object.Service;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 using GloryDay.Debug;
 using UnityEngine;
 
@@ -13,9 +13,11 @@ namespace Core.Object.Module
         {
             Console.LogProgress();
 
+            var transform = resolver.GetLocalService<ModuleTransformResolver>().Main;
+
             Console.LogSuccess($"{nameof(ModuleSocketBuilder).ToNicifyPascalCase().ToBoldStyle()} is created.");
 
-            return new ModuleSocketBuilder(resolver);
+            return new ModuleSocketBuilder(transform);
         }
 
         public override InstallationMode Mode => InstallationMode.Automatic;

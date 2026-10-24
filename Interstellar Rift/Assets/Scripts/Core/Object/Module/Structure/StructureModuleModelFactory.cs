@@ -1,6 +1,6 @@
 using System;
 using Core.Test;
-using Core.Utility.Extension;
+using Core.Utility.Extensions;
 
 using Console = GloryDay.Debug.Console;
 

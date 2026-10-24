@@ -59,5 +59,7 @@ namespace Core.Object
         {
             _mouseButtonEventDispatcher.DragMouseButton(eventData);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }

@@ -5,7 +5,7 @@ namespace Core.Object.Module
 {
     public class ModuleModelResolver : LocalService
     {
-        public ModuleModelResolver(ModuleModel model, ServiceResolver resolver) : base(resolver)
+        public ModuleModelResolver(ModuleModel model)
         {
             Console.LogProgress();
 

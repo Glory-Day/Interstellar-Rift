@@ -26,16 +26,6 @@ namespace Core.Object.Module
         }
 
         /// <summary>
-        /// Position of the searched connectable <see cref="Slot"/>.
-        /// </summary>
-        public Vector3 Position => Slot.transform.position;
-
-        /// <summary>
-        /// The outward-facing direction of the searched connectable <see cref="Slot"/>.
-        /// </summary>
-        public Vector3 Outward => Slot.transform.up;
-
-        /// <summary>
         /// <see cref="Direction"/> of the searched connectable <see cref="Slot"/>.
         /// </summary>
         public Direction Direction => Slot.Direction;

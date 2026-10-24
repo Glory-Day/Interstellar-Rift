@@ -50,5 +50,7 @@ namespace Core.Object
 
             _mousePointerEventDispatcher.ExitMousePointer(eventData);
         }
+
+        public override InstallationMode Mode => InstallationMode.Automatic;
     }
 }
